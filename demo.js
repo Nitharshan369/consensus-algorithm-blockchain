@@ -1277,31 +1277,225 @@ function initPoSpaceDemo(container, desc) {
 // 8. PoB Demo
 // ==========================================
 function initPobDemo(container, desc) {
-  desc.textContent = "Proof of Burn: Send coins to an unspendable address to gain virtual mining power.";
+  desc.textContent = "Proof of Burn: Burn your coins to gain Virtual Mining Power. Higher power increases your chance of winning block creation rights.";
+  
   container.innerHTML = `
-    <div class="demo-block">
-      <div class="demo-row"><span class="demo-label" style="width:120px">Your Balance:</span><strong id="pobBal">100 Coins</strong></div>
-      <div class="demo-row"><span class="demo-label" style="width:120px">Virtual Power:</span><strong id="pobPow" style="color:var(--amber)">0</strong></div>
-      <div class="demo-row"><span class="demo-label" style="width:120px">Amount to Burn:</span><input type="number" id="pobAmt" class="demo-input" value="10" min="1"></div>
-      <button class="demo-btn" id="pobBtn" style="margin-top:10px; border-color:var(--amber); color:var(--amber);">🔥 Burn Coins</button>
-      <div id="pobRes" class="demo-message"></div>
+    <div style="display:flex; justify-content:flex-end; margin-bottom: 15px;">
+      <button class="demo-btn" id="pobResetBtn" style="padding: 6px 12px; font-size: 0.85rem;">↺ Reset Demo</button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      
+      <!-- Network Panel -->
+      <div class="demo-block" style="background:rgba(0,0,0,0.02); border-color:var(--amber);">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom:10px;">
+          <h4 style="margin-top:0; color:var(--amber); font-family:'Orbitron';">Virtual Mining Network</h4>
+        </div>
+        
+        <div style="display:flex; justify-content:space-between; gap:20px; align-items:flex-end; flex-wrap:wrap;">
+          <div style="flex-grow:1;">
+            <div class="demo-row">
+              <span class="demo-label" style="width:140px;">Your Wallet Balance</span>
+              <strong id="pobBal" style="font-size:1.1rem;">1000 Coins</strong>
+            </div>
+            <div class="demo-row" style="margin-top:10px;">
+              <span class="demo-label" style="width:140px; color:var(--amber)">Your Virtual Power</span>
+              <strong id="pobPow" style="font-size:1.1rem; color:var(--amber)">0</strong>
+            </div>
+            <div class="demo-row" style="margin-top:10px;">
+              <span class="demo-label" style="width:140px; color:var(--ink-faint)">Rival A Virtual Power</span>
+              <span style="font-size:1.1rem; color:var(--ink-faint)">500</span>
+            </div>
+            <div class="demo-row" style="margin-top:10px;">
+              <span class="demo-label" style="width:140px; color:var(--ink-faint)">Rival B Virtual Power</span>
+              <span style="font-size:1.1rem; color:var(--ink-faint)">300</span>
+            </div>
+          </div>
+          
+          <div style="display:flex; flex-direction:column; gap:10px; width:180px;">
+            <label style="font-size:0.75rem; color:var(--amber); font-weight:bold;">🔥 Burn Coins for Power</label>
+            <input type="number" id="pobAmt" class="demo-input" value="100" min="10" step="10">
+            <button class="demo-btn" id="pobBurnBtn" style="border-color:var(--amber); color:var(--amber);">Destroy Coins</button>
+          </div>
+        </div>
+        <div id="pobLog" style="margin-top:15px; font-family:'Share Tech Mono'; color:var(--magenta); text-align:center;">Network Total Power: 800. Your Win Chance: 0.0%</div>
+      </div>
+
+      <!-- Block 1 -->
+      <div class="demo-block" id="pobBlock1">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom: 16px;">
+          <h4 style="margin:0; color:var(--red);">Block #1</h4>
+        </div>
+        <div class="demo-row"><span class="demo-label">Data</span><textarea class="demo-input" id="pobData1" rows="2">TX: Alice → Bob 5 BTC</textarea></div>
+        <div class="demo-row"><span class="demo-label">Producer</span><input type="text" class="demo-input" id="pobProd1" disabled placeholder="Waiting for selection..."></div>
+        <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="pobPrev1" value="00000000000000000000000000000000" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
+        <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="pobHash1" disabled style="font-size:0.75rem;"></div>
+        <button class="demo-btn" id="pobBtn1" style="margin-top:15px; border-color:var(--amber); color:var(--amber);">🔥 Compete to Produce Block</button>
+      </div>
+
+      <!-- Block 2 -->
+      <div class="demo-block" id="pobBlock2" style="opacity: 0.4; pointer-events: none;">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom: 16px;">
+          <h4 style="margin:0; color:var(--red);">Block #2</h4>
+        </div>
+        <div class="demo-row"><span class="demo-label">Data</span><textarea class="demo-input" id="pobData2" rows="2">TX: Charlie → Dave 1 BTC</textarea></div>
+        <div class="demo-row"><span class="demo-label">Producer</span><input type="text" class="demo-input" id="pobProd2" disabled placeholder="Waiting for selection..."></div>
+        <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="pobPrev2" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
+        <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="pobHash2" disabled style="font-size:0.75rem;"></div>
+        <button class="demo-btn" id="pobBtn2" style="margin-top:15px; border-color:var(--amber); color:var(--amber);">🔥 Compete to Produce Block</button>
+      </div>
+
+      <!-- Block 3 -->
+      <div class="demo-block" id="pobBlock3" style="opacity: 0.4; pointer-events: none;">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom: 16px;">
+          <h4 style="margin:0; color:var(--red);">Block #3</h4>
+        </div>
+        <div class="demo-row"><span class="demo-label">Data</span><textarea class="demo-input" id="pobData3" rows="2">TX: Eve → Frank 10 BTC</textarea></div>
+        <div class="demo-row"><span class="demo-label">Producer</span><input type="text" class="demo-input" id="pobProd3" disabled placeholder="Waiting for selection..."></div>
+        <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="pobPrev3" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
+        <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="pobHash3" disabled style="font-size:0.75rem;"></div>
+        <button class="demo-btn" id="pobBtn3" style="margin-top:15px; border-color:var(--amber); color:var(--amber);">🔥 Compete to Produce Block</button>
+      </div>
+      
     </div>
   `;
-  let bal = 100, pow = 0;
-  document.getElementById('pobBtn').addEventListener('click', () => {
-    const amt = parseInt(document.getElementById('pobAmt').value);
-    const res = document.getElementById('pobRes');
-    if(amt > bal) {
-      res.textContent = "Not enough coins to burn!"; res.className = 'demo-message error';
-    } else {
-      bal -= amt;
-      pow += amt * 2.5; // multiplier for virtual power
-      document.getElementById('pobBal').textContent = bal + ' Coins';
-      document.getElementById('pobPow').textContent = pow;
-      res.textContent = `Burned ${amt} coins permanently. Virtual power increased!`;
-      res.className = 'demo-message success';
-    }
+
+  let state = {
+    bal: 1000,
+    pow: 0,
+    rA: 500,
+    rB: 300
+  };
+
+  const balEl = document.getElementById('pobBal');
+  const powEl = document.getElementById('pobPow');
+  const logEl = document.getElementById('pobLog');
+  const amtEl = document.getElementById('pobAmt');
+
+  function updateStats() {
+    balEl.textContent = state.bal + ' Coins';
+    powEl.textContent = state.pow;
+    const total = state.pow + state.rA + state.rB;
+    const chance = ((state.pow / total) * 100).toFixed(1);
+    logEl.textContent = `Network Total Power: ${total}. Your Win Chance: ${chance}%`;
+  }
+
+  document.getElementById('pobBurnBtn').addEventListener('click', () => {
+    let amt = parseInt(amtEl.value);
+    if(isNaN(amt) || amt <= 0) return;
+    if(amt > state.bal) amt = state.bal; // burn max available
+    
+    state.bal -= amt;
+    state.pow += amt; // 1 coin = 1 virtual power
+    updateStats();
+    
+    const btn = document.getElementById('pobBurnBtn');
+    btn.textContent = "🔥 Burned!";
+    setTimeout(() => btn.textContent = "Destroy Coins", 1000);
   });
+
+  const blocks = [
+    {
+      blockEl: document.getElementById('pobBlock1'),
+      dataEl: document.getElementById('pobData1'),
+      prodEl: document.getElementById('pobProd1'),
+      prevEl: document.getElementById('pobPrev1'),
+      hashEl: document.getElementById('pobHash1'),
+      btn: document.getElementById('pobBtn1'),
+      signed: false
+    },
+    {
+      blockEl: document.getElementById('pobBlock2'),
+      dataEl: document.getElementById('pobData2'),
+      prodEl: document.getElementById('pobProd2'),
+      prevEl: document.getElementById('pobPrev2'),
+      hashEl: document.getElementById('pobHash2'),
+      btn: document.getElementById('pobBtn2'),
+      signed: false
+    },
+    {
+      blockEl: document.getElementById('pobBlock3'),
+      dataEl: document.getElementById('pobData3'),
+      prodEl: document.getElementById('pobProd3'),
+      prevEl: document.getElementById('pobPrev3'),
+      hashEl: document.getElementById('pobHash3'),
+      btn: document.getElementById('pobBtn3'),
+      signed: false
+    }
+  ];
+
+  blocks.forEach((b, i) => {
+    b.btn.addEventListener('click', () => {
+      b.btn.disabled = true;
+      b.btn.textContent = "Selecting Winner...";
+      b.btn.style.borderColor = "var(--line)";
+      b.btn.style.color = "var(--ink-faint)";
+      
+      setTimeout(async () => {
+        const total = state.pow + state.rA + state.rB;
+        const r = Math.random() * total;
+        
+        let winnerName = "";
+        let isMe = false;
+
+        if (r < state.pow) {
+          winnerName = "You";
+          isMe = true;
+        } else if (r < state.pow + state.rA) {
+          winnerName = "Rival A";
+        } else {
+          winnerName = "Rival B";
+        }
+
+        b.prodEl.value = winnerName;
+        b.prodEl.style.color = isMe ? "var(--green)" : "var(--amber)";
+        b.prodEl.style.fontWeight = "bold";
+
+        if(isMe) {
+          state.bal += 50; // Block reward
+          updateStats();
+        }
+
+        b.signed = true;
+        if(i > 0) b.prevEl.value = blocks[i-1].hashEl.value;
+        await updateBlockHash(b);
+        
+        b.btn.textContent = isMe ? "✅ You Produced Block (+50 Reward)" : "⚠️ Rival Produced Block";
+        b.btn.style.borderColor = isMe ? "var(--green)" : "var(--amber)";
+        b.btn.style.color = isMe ? "var(--green)" : "var(--amber)";
+        b.blockEl.style.borderColor = isMe ? "var(--green)" : "var(--amber)";
+        
+        // Enable next block
+        if(i+1 < blocks.length) {
+          blocks[i+1].blockEl.style.opacity = '1';
+          blocks[i+1].blockEl.style.pointerEvents = 'auto';
+          blocks[i+1].prevEl.value = b.hashEl.value;
+          blocks[i+1].btn.disabled = false;
+        }
+      }, 1000);
+    });
+
+    b.dataEl.addEventListener('input', async () => {
+      if(b.signed) {
+        await updateBlockHash(b);
+        for(let j=i+1; j<blocks.length; j++) {
+          if(blocks[j].signed) {
+            blocks[j].prevEl.value = blocks[j-1].hashEl.value;
+            await updateBlockHash(blocks[j]);
+          }
+        }
+      }
+    });
+  });
+
+  document.getElementById('pobResetBtn').addEventListener('click', () => initPobDemo(container, desc));
+  
+  async function updateBlockHash(b) {
+    const content = b.dataEl.value + b.prodEl.value + b.prevEl.value;
+    b.hashEl.value = await sha256(content);
+  }
+
+  // Initialize initial hash
+  updateBlockHash(blocks[0]);
 }
 
 // ==========================================

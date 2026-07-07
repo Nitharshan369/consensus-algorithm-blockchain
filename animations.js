@@ -558,33 +558,130 @@ function animPospace(t){
 }
 
 function animPob(t){
-  const cx=W/2, cy=60;
-  if(!vizState.powers) vizState.powers=[500,200,800];
-  if(vizState.winner===undefined){ vizState.winner=-1; vizState.timer=0; }
-  ctx.clearRect(0,0,W,H);
-  for(let i=0;i<3;i++){
-    const x = cx - 90 + i*90;
-    const active = i===vizState.winner;
-    drawNode(x, cy, 22, 'N'+(i+1), active);
-    vizState.powers[i] = Math.max(0, vizState.powers[i]-0.2); // decaying power
-    if(Math.random()<0.01) vizState.powers[i]+=300; // random burn
-    ctx.fillStyle = active ? COLORS.green : '#888';
-    ctx.font='9px "Share Tech Mono"'; ctx.textAlign='center';
-    ctx.fillText('Power:'+(vizState.powers[i]|0), x, cy+36);
+  const cx=W/2, cy=120;
+  if(!vizState.powers) {
+    vizState.powers = [100, 500, 1000]; // initial virtual power
   }
-  ctx.font='10px "Share Tech Mono"'; ctx.fillStyle=COLORS.ink; ctx.textAlign='center';
-  ctx.fillText('Burning coins grants decaying virtual mining power', cx, cy+65);
+  if(vizState.timer === undefined) {
+    vizState.phase = 0; 
+    vizState.timer = 0; 
+    vizState.winner = -1;
+    vizState.burners = [{active:false, t:0}, {active:false, t:0}, {active:false, t:0}];
+  }
+  
+  ctx.clearRect(0,0,W,H);
+  
+  const burnY = 40;
+  const pos = [
+    [cx - 110, cy],
+    [cx, cy],
+    [cx + 110, cy]
+  ];
+  
+  const phaseColors = [COLORS.amber, COLORS.cyan, COLORS.green];
+  const phaseLabels = [
+    "Phase: Burning Coins for Virtual Power",
+    "Phase: Selecting Winner based on Power",
+    "Phase: Winner Produces Block"
+  ];
+  
+  // Draw connections to burn address
+  for(let i=0; i<3; i++){
+    ctx.beginPath();
+    ctx.moveTo(pos[i][0], pos[i][1]);
+    ctx.lineTo(cx, burnY);
+    ctx.strokeStyle = 'rgba(211,47,47,0.1)'; // faint red
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Simulate active burning
+    if (vizState.phase === 0 && Math.random() < 0.05 && !vizState.burners[i].active) {
+      vizState.burners[i].active = true;
+      vizState.burners[i].t = 0;
+      vizState.powers[i] += 50; // increase power
+    }
+    
+    if (vizState.burners[i].active) {
+       vizState.burners[i].t += 0.05;
+       let p = vizState.burners[i].t;
+       if (p > 1) vizState.burners[i].active = false;
+       else {
+         let px = pos[i][0] + (cx - pos[i][0]) * p;
+         let py = pos[i][1] + (burnY - pos[i][1]) * p;
+         ctx.beginPath();
+         ctx.arc(px, py, 4, 0, Math.PI*2);
+         ctx.fillStyle = COLORS.amber; // fire color
+         ctx.fill();
+       }
+    }
+    
+    // Power decays slowly over time
+    if(t%2===0 && vizState.powers[i] > 10) vizState.powers[i] -= 0.2;
+  }
+  
+  // Draw Burn Address (Fire)
+  drawNode(cx, burnY, 20, '🔥', vizState.phase === 0);
+  ctx.font='9px "Share Tech Mono"'; ctx.fillStyle=COLORS.amber; ctx.textAlign='center';
+  ctx.fillText("Burn Address", cx, burnY - 28);
+
+  ctx.font='11px "Share Tech Mono"'; ctx.textAlign='center';
+  ctx.fillStyle=phaseColors[vizState.phase];
+  ctx.fillText(phaseLabels[vizState.phase], cx, cy + 60);
+
+  // Draw Burners
+  for(let i=0; i<3; i++){
+    const x = pos[i][0];
+    const y = pos[i][1];
+    const isWinner = (vizState.phase === 2 && i === vizState.winner);
+    const isSelecting = (vizState.phase === 1);
+    const isActive = isWinner || isSelecting || vizState.burners[i].active;
+    
+    drawNode(x, y, 26, 'Node', isActive);
+    
+    ctx.fillStyle = isWinner ? COLORS.green : (isSelecting ? COLORS.cyan : '#888');
+    ctx.font='10px "Share Tech Mono"'; 
+    ctx.fillText((vizState.powers[i]|0) + ' Power', x, y + 42);
+    
+    if(isWinner) {
+      ctx.fillStyle = COLORS.green;
+      ctx.fillText('Winner', x, y - 38);
+      ctx.strokeStyle = COLORS.green;
+      ctx.beginPath();
+      ctx.moveTo(x, y + 26);
+      ctx.lineTo(cx, cy + 45); 
+      ctx.stroke();
+    } else if (isSelecting) {
+      ctx.globalAlpha = 0.5 + 0.5 * Math.sin(t / 5 + i);
+      ctx.fillStyle = COLORS.cyan;
+      ctx.fillText('Evaluating', x, y - 38);
+      ctx.globalAlpha = 1;
+    }
+  }
   
   vizState.timer++;
-  if(vizState.timer>80){
-    vizState.timer=0;
-    let max=0, mIdx=0;
-    for(let i=0;i<3;i++){ if(vizState.powers[i]>max){ max=vizState.powers[i]; mIdx=i; } }
-    vizState.winner = mIdx;
-    pushBlock(COLORS.red);
+  if(vizState.timer > 100) {
+    vizState.timer = 0;
+    vizState.phase++;
+    
+    if(vizState.phase === 2) {
+      // Pick winner weighted by power
+      const totalPower = vizState.powers[0] + vizState.powers[1] + vizState.powers[2];
+      const r = Math.random() * totalPower;
+      if (r < vizState.powers[0]) vizState.winner = 0;
+      else if (r < vizState.powers[0] + vizState.powers[1]) vizState.winner = 1;
+      else vizState.winner = 2;
+    }
+    
+    if(vizState.phase === 3) {
+       pushBlock(COLORS.green);
+       vizState.phase = 0;
+       vizState.winner = -1;
+    }
   }
+  
   drawDynamicChain();
 }
+
 
 function animPoet(t){
   const cx=W/2, cy=60;

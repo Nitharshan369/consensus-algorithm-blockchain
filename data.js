@@ -455,26 +455,67 @@ const ALGOS = [
 },
 {
   id:'pob', code:'PoB', name:'Proof of Burn',
-  mechanism:"Participants send coins to a verifiably unspendable 'eater' address, permanently destroying them. This burned amount acts as a virtual, decaying form of mining power — the more (and more recently) you've burned, the better your chance of producing the next block.",
+  mechanism:"Proof of Burn (PoB) is a consensus algorithm in which participants permanently destroy (burn) cryptocurrency coins by sending them to an unspendable wallet address. Burning coins demonstrates a long-term commitment to the network. In return, participants earn the right to create new blocks and receive rewards. Instead of spending computational power (PoW) or locking coins (PoS), PoB requires users to sacrifice coins permanently.",
   steps:[
-    "A miner sends coins to a provably unspendable burn address.",
-    "The network can verify the transaction is real and irreversible on-chain.",
-    "Burned coins convert into 'virtual mining power' that decays over time.",
-    "Block-producing rights are awarded proportional to current virtual power.",
-    "Because burning has a real cost, it substitutes for wasted electricity or locked stake."
+    "Users obtain cryptocurrency that can be burned.",
+    "Participants send coins to a burn address (an address with no private key), permanently destroying them.",
+    "The blockchain verifies that the burn transaction is valid and the coins are removed from circulation.",
+    "Participants who burn more coins receive a greater chance of being selected to create future blocks.",
+    "The chosen participant collects transactions and creates the next block.",
+    "Other nodes verify the burn transaction, transaction validity, digital signatures, and no double spending.",
+    "Once verified, the block is added to the blockchain, and consensus is reached.",
+    "The validator receives newly minted coins and transaction fees as rewards."
   ],
   layer:'L1', vizTag:'COIN INCINERATION',
-  vizCaption:'Coins are sent to an unspendable address; burned value converts into decaying mining power.',
-  trilemma:{scal:5, sec:6, dec:6, blockTime:'Varies by chain', tps:'Low-moderate', attack:'Wealth concentration re-burn attack'},
-  explain:"An interesting middle ground — costly like PoW (you sacrifice real value) but without ongoing energy draw, though adoption remains niche.",
-  performance: { tps: "Low-moderate", blockTime: "Varies", finality: "Probabilistic", energy: "Low", latency: "Medium" },
-  pros: ["No energy waste", "Creates scarcity", "Long-term commitment rewarded"],
-  cons: ["Wealth favors the rich", "Permanent loss of assets", "Niche adoption"],
-  chains:[
-    {name:'Slimcoin (SLM)', why:'One of the first chains to implement PoB as its primary consensus, layered atop PoW/PoS elements.', lang:'Script-based'},
-    {name:'Counterparty (XCP)', why:'Originally distributed its native token entirely via burning Bitcoin, tying its security to Bitcoin\'s history.', lang:'Custom scripting on Bitcoin'}
+  vizCaption:'Participants permanently destroy coins; higher burn amounts yield greater block creation probability.',
+  explain: "Imagine a company selecting employees for a leadership position. Each employee must permanently surrender some valuable coupons to prove their commitment. Employee C burns 100 coupons and therefore has a higher chance of becoming the leader. Similarly, in PoB, participants who burn more coins generally have a higher chance of creating the next block.",
+  trilemma:{scal:8, sec:8, dec:6, blockTime:'Varies by chain', tps:'Moderate', attack:'Wealth concentration attack'},
+  
+  trilemmaTable: [
+    {prop: '🚀 Scalability', rating: '★★★★☆ (4/5)', exp: 'No mining competition reduces computational overhead, allowing efficient block creation.'},
+    {prop: '🔒 Security', rating: '★★★★☆ (4/5)', exp: 'Burning coins makes attacks expensive because attackers permanently lose their cryptocurrency.'},
+    {prop: '🌐 Decentralization', rating: '★★★☆☆ (3/5)', exp: 'Users who can afford to burn more coins may gain greater influence over block creation.'}
   ],
-  summary: { mining: "Virtual", validators: "Burners", voting: "No", speed: "Moderate", security: "Moderate", decentralization: "Moderate" }
+  trilemmaSummary: 'PoB provides <b>good scalability and security</b> while reducing energy consumption. However, wealthier participants can gain an advantage by burning larger amounts of cryptocurrency.',
+
+  performance: { tps: "Moderate", blockTime: "Varies", finality: "Probabilistic", energy: "Very Low", latency: "Medium" },
+  pros: ["Very low energy consumption compared to PoW", "No expensive mining hardware is required", "Demonstrates long-term commitment", "Makes attacks costly (burned coins cannot be recovered)", "Reduces circulating supply"],
+  cons: ["Burned coins are permanently lost", "Wealthier users can burn more coins and gain greater influence", "Limited adoption compared to PoW and PoS", "Reduces available coin supply"],
+  chains:[
+    {name:'Slimcoin (SLM)', why:'Uses Proof of Burn as its primary consensus mechanism, allowing miners to burn coins instead of using computational power.', lang:'None'},
+    {name:'Counterparty (XCP)', why:'Created its tokens by burning Bitcoin, demonstrating the use of the burn concept during token creation.', lang:'Bitcoin Script'}
+  ],
+  
+  smartContracts: [
+    {chain: 'Slimcoin', lang: 'None', rel: 'PoB focuses on consensus and does not provide native smart contract support.'},
+    {chain: 'Counterparty', lang: 'Bitcoin Script', rel: 'Uses Bitcoin\'s scripting capabilities while coin burning is used for token creation and network participation.'}
+  ],
+  smartContractNote: "<b>Note:</b> PoB determines <b>who creates the next block</b>, while smart contract languages (if available) define <b>how blockchain applications are developed</b>.",
+
+  layerClassification: {
+    layer: 'Layer 1',
+    description: 'Slimcoin is a Layer 1 blockchain. A Layer 1 blockchain is responsible for validating transactions, maintaining the blockchain ledger, reaching consensus, and managing the native cryptocurrency.',
+    examples: ['Slimcoin'],
+    whyNotLayer2: 'PoB enables Layer 1 consensus by using coin burning instead of mining or staking.'
+  },
+  
+  compatibility: [
+    {name:'Slimcoin', consensus:'PoB', compatible:true},
+    {name:'Counterparty', consensus:'Coin Burn Mechanism', compatible:'Partial'},
+    {name:'Bitcoin', consensus:'PoW', compatible:false},
+    {name:'Ethereum', consensus:'PoS', compatible:false},
+    {name:'Solana', consensus:'PoH + PoS', compatible:false},
+    {name:'Cardano', consensus:'PoS', compatible:false},
+    {name:'Hyperledger Fabric', consensus:'PBFT', compatible:false}
+  ],
+
+  summary: { mining: "Virtual", validators: "Burners", voting: "No", speed: "Moderate", security: "High", decentralization: "Moderate" },
+  
+  mappingAdditionalInfo: [
+    { title: "Polkadot", text: "Polkadot is a foundational multichain network that unites and secures independent blockchains, allowing them to share data and transfer assets seamlessly without centralized intermediaries. Created by Ethereum co-founder Dr. Gavin Wood, it aims to solve the scalability and isolation issues of earlier networks by enabling specialized blockchains to communicate easily." },
+    { title: "Slimcoin (SLM)", text: "<b>Slimcoin</b> is a <b>Layer 1 cryptocurrency</b> that primarily uses the <b>Proof of Burn (PoB)</b> consensus mechanism. Instead of relying only on mining or staking, users <b>burn (permanently destroy) coins</b> to earn the right to create new blocks and receive rewards.<br><br><b>Key Points:</b><br>• Uses <b>Proof of Burn (PoB)</b> as its main consensus mechanism.<br>• Coins are permanently burned to gain mining rights.<br>• Designed to be more <b>energy-efficient</b> than Proof of Work (PoW).<br>• One of the few blockchains that demonstrates the practical use of Proof of Burn." }
+  ],
+  takeaway: "<b>Proof of Burn (PoB)</b> is a consensus algorithm in which participants <b>permanently destroy cryptocurrency</b> by sending it to an <b>unspendable burn address</b>. The amount of cryptocurrency burned represents the participant's commitment to the network and increases their chance of creating future blocks. PoB provides <b>low energy consumption, strong security, and efficient consensus</b>, but requires users to permanently sacrifice their coins and is used by only a small number of blockchain networks."
 },
 {
   id:'poet', code:'PoET', name:'Proof of Elapsed Time',
