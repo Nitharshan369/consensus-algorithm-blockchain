@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What is Blockchain? — Consensus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation injected by layout.js -->
+  <div class="floating-blocks">
+    <div class="float-block" style="left: 10%; width: 40px; height: 40px; animation-duration: 15s; animation-delay: 0s;"></div>
+    <div class="float-block" style="left: 30%; width: 60px; height: 60px; animation-duration: 25s; animation-delay: -5s;"></div>
+    <div class="float-block" style="left: 60%; width: 30px; height: 30px; animation-duration: 18s; animation-delay: -2s;"></div>
+    <div class="float-block" style="left: 80%; width: 70px; height: 70px; animation-duration: 22s; animation-delay: -10s;"></div>
+    <div class="float-block" style="left: 45%; width: 50px; height: 50px; animation-duration: 20s; animation-delay: -7s;"></div>
+  </div>
+  <div class="page-container reveal in">
+    <div class="page-header">
+      <div class="pill mono l1" style="display:inline-block; margin-bottom: 12px; border-color: var(--cyan); color: var(--cyan);">// 01 INTRODUCTION</div>
+      <h1>What is Blockchain?</h1>
+      <p>A decentralized, distributed, and cryptographically secured digital ledger.</p>
+    </div>
+
+    <div class="panel">
+      <div class="text-content">
+        <p>A <b>blockchain</b> is a <b>distributed digital ledger</b> that records transactions securely across many computers (called <b>nodes</b>) instead of storing them in one central place.</p>
+        
+        <p>Think of it as a <b>shared notebook</b>:</p>
+        <ul>
+          <li>Everyone has a copy of the notebook.</li>
+          <li>Whenever someone writes a new page (block), everyone updates their copy.</li>
+          <li>Once a page is added, it <b>cannot be changed</b> without everyone noticing.</li>
+        </ul>
+        <p>This makes blockchain <b>transparent, secure, and tamper-resistant</b>.</p>
+
+        <h4>Why was Blockchain Created?</h4>
+        <p>Before blockchain, digital transactions usually required a <b>trusted third party</b>, such as Banks, Payment processors, or Governments. Blockchain removes the need for a central authority by allowing participants to <b>trust the system instead of trusting each other</b>.</p>
+
+        <div class="divider" style="margin: 30px 0; max-width: 100%;"></div>
+
+        <h4>Properties of Blockchain</h4>
+        <div class="stats-grid" style="margin-top: 16px;">
+          <div class="stat-card">
+            <span class="label">1. Decentralized</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">Blockchain is <b>not controlled by a single authority</b>. Instead, the ledger is shared across many computers (nodes), making the network more reliable and resistant to failures or censorship.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">2. Transparent</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">All confirmed transactions are <b>visible to every participant</b> on the network (in public blockchains). This allows anyone to verify the transaction history, increasing trust and accountability.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">3. Immutable</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">Once a transaction is <b>recorded and confirmed</b>, it cannot be easily changed or deleted. Any attempt to modify a block breaks the chain and is rejected by the network.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">4. Secured</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">Blockchain uses <b>cryptographic hashing, digital signatures, and consensus mechanisms</b> to protect data, verify transactions, and prevent unauthorized changes or fraud.</p>
+          </div>
+        </div>
+
+        <div class="divider" style="margin: 30px 0; max-width: 100%;"></div>
+
+        <h4>Components of Blockchain</h4>
+        <div class="stats-grid" style="margin-top: 16px;">
+          <div class="stat-card">
+            <span class="label">1. Node</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">A computer connected to the network that stores a copy of the blockchain, verifies transactions, and helps validate and propagate new blocks.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">2. Ledger</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">The blockchain's digital record of all transactions. It is distributed across all nodes, ensuring everyone has the same copy.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">3. Wallet</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">Software or physical device used to store <b>public and private keys</b>. Allows users to send, receive, and securely sign transactions.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">4. Hash</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">A fixed-length cryptographic value (e.g., SHA-256) acting like a digital fingerprint. Ensures integrity; small changes produce completely different hashes.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">5. Nonce</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">A "number used once" that miners repeatedly change to generate a valid block hash. Essential in <b>Proof of Work (PoW)</b>.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">6. Mining</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">The process of validating transactions and creating new blocks by solving complex cryptographic puzzles for rewards.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">7. Consensus Protocol</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">Rules that allow all nodes to agree on the validity of transactions (e.g., PoW, PoS, PBFT). Ensures only legitimate blocks are added.</p>
+          </div>
+        </div>
+
+        <div class="divider" style="margin: 30px 0; max-width: 100%;"></div>
+
+        <h4>Core Elements of a Blockchain Transaction</h4>
+        <div class="stats-grid" style="margin-top: 16px;">
+          <div class="stat-card">
+            <span class="label">1. Inputs</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">Source of the funds being spent, referencing previously received, unspent transaction outputs (UTXOs) or the sender's balance.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">2. Outputs</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">Specify where cryptocurrency is sent (recipient address and amount). May include a change output returning remaining balance to the sender.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">3. Digital Signature</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">A cryptographic proof created using the sender's <b>private key</b>, verifying ownership and authenticating the transaction.</p>
+          </div>
+          <div class="stat-card">
+            <span class="label">4. Transaction Fee</span>
+            <p style="font-size: 0.9rem; margin-top: 5px;">Amount paid to compensate miners/validators for processing. Higher fees encourage faster confirmation.</p>
+          </div>
+        </div>
+
+        <div class="divider" style="margin: 30px 0; max-width: 100%;"></div>
+        
+        <h4>ECDSA (Elliptic Curve Digital Signature Algorithm)</h4>
+        <p>ECDSA is a cryptographic algorithm used in blockchain to digitally sign transactions. It proves that a transaction was created by the legitimate owner of the funds without revealing their private key.</p>
+        <p style="margin-top: 10px;"><b>Why is ECDSA Used?</b></p>
+        <ul>
+          <li><b>Authentication</b> – Verifies that the transaction was created by the rightful owner.</li>
+          <li><b>Integrity</b> – Ensures the transaction has not been modified after signing.</li>
+          <li><b>Non-repudiation</b> – The sender cannot deny creating the transaction.</li>
+        </ul>
+        <div class="ecdsa-flow">
+          <div class="flow-node">Generate Random Number</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node">Private Key</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node highlight">ECC (secp256k1)</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node">Public Key</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node">Hash Public Key</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node">Wallet Address</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node highlight">Create Transaction</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node">Hash Transaction</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node highlight">Sign Using ECDSA (Private Key)</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node">Digital Signature</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node">Broadcast to Network</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node">Verify Using Public Key</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node">Consensus & Block Inclusion</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-node finish">Transaction Confirmed</div>
+        </div>
+
+        <div class="divider" style="margin: 30px 0; max-width: 100%;"></div>
+
+        <h4>Blockchain Transaction Lifecycle</h4>
+        <ol class="flowchart-steps" style="margin-top: 20px; padding-top: 10px;">
+          <li><b>Create Transaction:</b> Sender enters recipient, amount, and fee in a wallet.</li>
+          <li><b>Sign Transaction (ECDSA):</b> Transaction is hashed and digitally signed using the sender's private key.</li>
+          <li><b>Broadcast to Network:</b> The signed transaction is sent to blockchain nodes.</li>
+          <li><b>Enter Mempool:</b> Valid, unconfirmed transactions wait in a temporary memory pool (Mempool). Nodes verify signatures, balances, formats, and prevent double spending.</li>
+          <li><b>Miner/Validator Selects Transaction:</b> Miners or validators choose transactions, often prioritizing higher fees.</li>
+          <li><b>Consensus Process:</b> The network agrees that the new block is valid using its consensus protocol (PoW, PoS, etc.).</li>
+          <li><b>Block Creation:</b> Valid transactions are packaged into a new candidate block.</li>
+          <li><b>Block Added to Blockchain:</b> The validated block is linked to the previous block, updating everyone's ledger.</li>
+          <li><b>Transaction Confirmed:</b> The block is permanently added. Subsequent blocks add more confirmations.</li>
+        </ol>
+        
+        <table class="data-table" style="margin-top: 20px;">
+          <tr><th>Stage</th><th>Description</th></tr>
+          <tr><td>Create Transaction</td><td>Sender initiates transfer via wallet.</td></tr>
+          <tr><td>ECDSA Signing</td><td>Proves ownership using the sender's private key.</td></tr>
+          <tr><td>Broadcast</td><td>Sent to nearby nodes, spreading through network.</td></tr>
+          <tr><td>Mempool</td><td>Temporary waiting area for valid, pending transactions.</td></tr>
+          <tr><td>Validation</td><td>Nodes check signatures, balances, and double spending.</td></tr>
+          <tr><td>Selection</td><td>Block producers select transactions, usually by fee.</td></tr>
+          <tr><td>Consensus</td><td>Network nodes reach agreement on block validity.</td></tr>
+          <tr><td>Block Creation</td><td>Transactions bundled into a new block with a hash.</td></tr>
+          <tr><td>Confirmation</td><td>Added to the chain, transaction becomes permanent.</td></tr>
+        </table>
+
+        <div class="divider" style="margin: 30px 0; max-width: 100%;"></div>
+
+        <h4>The 6-Confirmation Rule in Blockchain</h4>
+        <p>The <b>6-confirmation rule</b> is a widely used guideline—especially in Bitcoin—to determine when a transaction is considered <b>highly secure and practically irreversible</b>.</p>
+        <p style="margin-top: 10px;">A transaction has <b>one confirmation</b> when it is included in a block. Every new block added after that increases the confirmation count by one.</p>
+        
+        <p style="margin-top: 10px;"><b>Why Are More Confirmations Needed?</b></p>
+        <p>To reverse a transaction, an attacker must create an alternative blockchain and outpace the honest network. Catching up becomes exceedingly difficult with each added block unless they control a vast majority of the network (e.g., 51% attack).</p>
+        
+        <table class="data-table" style="margin-top: 20px;">
+          <tr><th>Confirmations</th><th>Typical Use</th></tr>
+          <tr><td>0</td><td>Transaction is still pending (in the mempool).</td></tr>
+          <tr><td>1</td><td>Suitable for very small or low-risk payments.</td></tr>
+          <tr><td>2–3</td><td>Often sufficient for medium-value transactions.</td></tr>
+          <tr><td>6</td><td>Common standard for high-value Bitcoin transactions. (Approx 60 mins)</td></tr>
+        </table>
+
+        <div class="divider" style="margin: 40px 0; max-width: 100%;"></div>
+
+        <h4>What is a Consensus Algorithm?</h4>
+        <p>A <b>consensus algorithm</b> is a set of rules that helps all computers (nodes) in a blockchain <b>agree on which transactions are valid and who gets to add the next block</b>.</p>
+        
+        <div class="term-card">
+          <h5>Simple Definition</h5>
+          <p><b>A consensus algorithm is the method used by a blockchain network to reach agreement on a single, correct version of the blockchain.</b></p>
+          <hr style="border:0; border-top:1px dashed var(--line); margin: 15px 0;">
+          <h5>Analogy</h5>
+          <p>Imagine 10 friends deciding where to eat. Instead of everyone choosing differently, they follow one rule (like voting). The rule that helps everyone agree is similar to a <b>consensus algorithm</b>.</p>
+        </div>
+
+        <div class="divider" style="margin: 40px 0; max-width: 100%;"></div>
+
+        <h4>Basic Terms [Before Learning Consensus Algorithms]</h4>
+        <p style="margin-bottom: 20px;">These are the core concepts you should understand <b>before</b> comparing consensus algorithms.</p>
+
+        <div class="term-card">
+          <h5>1. Scalability</h5>
+          <p>The ability of a blockchain to handle an increasing number of transactions without slowing down or becoming expensive.</p>
+          <ul style="margin-top: 10px;">
+            <li><b>Block Creation Time:</b> The average time required to create a new block (e.g., Bitcoin ~10 mins vs Solana ~0.4s).</li>
+            <li><b>TPS (Transactions Per Second):</b> How many transactions a blockchain can process every second.</li>
+          </ul>
+        </div>
+
+        <div class="term-card">
+          <h5>2. Security</h5>
+          <p>The ability to protect data, transactions, and the consensus process from attacks. Key threats include:</p>
+          <ul style="margin-top: 10px;">
+            <li><b>51% Attack:</b> When a single entity controls >50% of mining/staking power, allowing them to reverse transactions or double spend.</li>
+            <li><b>Sybil Attack:</b> An attempt to gain network influence by creating many fake identities or nodes.</li>
+          </ul>
+        </div>
+
+        <div class="term-card">
+          <h5>3. Decentralisation</h5>
+          <p>How widely control and decision-making are distributed across independent participants.</p>
+          <p>A highly decentralized network has many independent nodes, no central authority, and high resistance to censorship.</p>
+        </div>
+
+        <div class="term-card">
+          <h5>4. Smart Contract Support & Layers</h5>
+          <ul style="margin-top: 10px;">
+            <li><b>Smart Contracts:</b> Self-executing programs on a blockchain (e.g., Ethereum uses Solidity).</li>
+            <li><b>Layer 1 (Base Blockchain):</b> The main independent network that provides consensus and security (e.g., Bitcoin, Solana).</li>
+            <li><b>Layer 2 (Scaling Solution):</b> A secondary network built on Layer 1 to improve speed and lower costs (e.g., Lightning Network, Arbitrum).</li>
+          </ul>
+        </div>
+
+        <div class="term-card">
+          <h5>5. Compatibility Matrix</h5>
+          <p>A comparison table showing which blockchains use the same consensus mechanism family. This helps understand security assumptions and protocol-level architectural relationships.</p>
+        </div>
+
+        <div class="divider" style="margin: 40px 0; max-width: 100%;"></div>
+
+        <h4>10 Famous Blockchain Consensus Algorithms</h4>
+        
+        <div class="algo-list-grid">
+          <div class="algo-list-card">
+            <div class="number">01</div>
+            <div class="title">Proof of Work <span class="short-name">PoW</span></div>
+            <ul>
+              <li>Miners solve difficult math puzzles.</li>
+              <li>First to solve adds the next block.</li>
+              <li>Very secure but uses high energy.</li>
+            </ul>
+            <div class="example">Example: Bitcoin</div>
+          </div>
+
+          <div class="algo-list-card">
+            <div class="number">02</div>
+            <div class="title">Proof of Stake <span class="short-name">PoS</span></div>
+            <ul>
+              <li>Validators lock (stake) their coins.</li>
+              <li>Validators are selected to create blocks.</li>
+              <li>Uses much less energy than PoW.</li>
+            </ul>
+            <div class="example">Example: Ethereum</div>
+          </div>
+
+          <div class="algo-list-card">
+            <div class="number">03</div>
+            <div class="title">Delegated PoS <span class="short-name">DPoS</span></div>
+            <ul>
+              <li>Coin holders vote for trusted validators.</li>
+              <li>Only elected validators create blocks.</li>
+            </ul>
+            <div class="example">Example: EOS, TRON</div>
+          </div>
+
+          <div class="algo-list-card">
+            <div class="number">04</div>
+            <div class="title">Proof of Authority <span class="short-name">PoA</span></div>
+            <ul>
+              <li>Trusted/approved validators create blocks.</li>
+              <li>Used in private blockchain networks.</li>
+            </ul>
+            <div class="example">Private & Consortium</div>
+          </div>
+
+          <div class="algo-list-card">
+            <div class="number">05</div>
+            <div class="title">Proof of History <span class="short-name">PoH</span></div>
+            <ul>
+              <li>Uses a cryptographic clock for time proof.</li>
+              <li>Speeds up ordering and validation.</li>
+            </ul>
+            <div class="example">Example: Solana</div>
+          </div>
+
+          <div class="algo-list-card">
+            <div class="number">06</div>
+            <div class="title">Practical BFT <span class="short-name">PBFT</span></div>
+            <ul>
+              <li>Validators exchange votes to agree.</li>
+              <li>Works even with malicious nodes.</li>
+            </ul>
+            <div class="example">Private & Consortium</div>
+          </div>
+
+          <div class="algo-list-card">
+            <div class="number">07</div>
+            <div class="title">Proof of Space <span class="short-name">PoSpace</span></div>
+            <ul>
+              <li>Uses available hard disk storage.</li>
+              <li>More energy-efficient than PoW.</li>
+            </ul>
+            <div class="example">Example: Chia</div>
+          </div>
+
+          <div class="algo-list-card">
+            <div class="number">08</div>
+            <div class="title">Proof of Burn <span class="short-name">PoB</span></div>
+            <ul>
+              <li>Participants permanently destroy coins.</li>
+              <li>Burning earns block validation rights.</li>
+            </ul>
+          </div>
+
+          <div class="algo-list-card">
+            <div class="number">09</div>
+            <div class="title">Proof of Elapsed Time <span class="short-name">PoET</span></div>
+            <ul>
+              <li>Each validator waits a random time.</li>
+              <li>Shortest waiting time creates the block.</li>
+            </ul>
+            <div class="example">Permissioned Chains</div>
+          </div>
+
+          <div class="algo-list-card">
+            <div class="number">10</div>
+            <div class="title">Proof of Importance <span class="short-name">PoI</span></div>
+            <ul>
+              <li>Selected based on account activity & stake.</li>
+              <li>Rewards active network contributors.</li>
+            </ul>
+            <div class="example">Example: NEM</div>
+          </div>
+        </div>
+        
+        <table class="data-table" style="margin-top: 30px;">
+          <tr><th>No.</th><th>Algorithm</th><th>Abbreviation</th></tr>
+          <tr><td>1</td><td>Proof of Work</td><td><b>PoW</b></td></tr>
+          <tr><td>2</td><td>Proof of Stake</td><td><b>PoS</b></td></tr>
+          <tr><td>3</td><td>Delegated Proof of Stake</td><td><b>DPoS</b></td></tr>
+          <tr><td>4</td><td>Proof of Authority</td><td><b>PoA</b></td></tr>
+          <tr><td>5</td><td>Proof of History</td><td><b>PoH</b></td></tr>
+          <tr><td>6</td><td>Practical Byzantine Fault Tolerance</td><td><b>PBFT</b></td></tr>
+          <tr><td>7</td><td>Proof of Space (Proof of Capacity)</td><td><b>PoSpace</b></td></tr>
+          <tr><td>8</td><td>Proof of Burn</td><td><b>PoB</b></td></tr>
+          <tr><td>9</td><td>Proof of Elapsed Time</td><td><b>PoET</b></td></tr>
+          <tr><td>10</td><td>Proof of Importance</td><td><b>PoI</b></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built as an educational explorer · consensus data is simplified for teaching purposes
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="layout.js"></script>
+</body>
+</html>

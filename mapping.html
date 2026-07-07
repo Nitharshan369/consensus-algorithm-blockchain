@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapping & Languages — Consensus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-container reveal in">
+    <div class="multi-col">
+      <!-- Sidebar injected by layout.js -->
+      <div id="algoRail" class="sidebar"></div>
+
+      <!-- Main Content -->
+      <div class="panel-stack" style="width: 100%;">
+        
+        <div class="panel">
+          <div class="panel-title">
+            <h3>Real-World Chains & Cryptocurrencies</h3>
+          </div>
+          <div class="chain-grid" id="chainGrid"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">
+            <h3>Smart Contract Languages</h3>
+          </div>
+          <div class="text-content">
+            <p>Each blockchain supports different programming languages for their smart contracts. Here are the primary languages associated with the selected consensus mechanism's representative chains.</p>
+            <table class="data-table" id="langTable">
+              <thead>
+                <tr>
+                  <th>Blockchain</th>
+                  <th>Smart Contract Language</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built as an educational explorer · consensus data is simplified for teaching purposes
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const algo = getSelectedAlgo();
+      document.title = `${algo.name} Mapping — Consensus Explorer`;
+      
+      const grid = document.getElementById('chainGrid');
+      const tbody = document.querySelector('#langTable tbody');
+      
+      grid.innerHTML = '';
+      tbody.innerHTML = '';
+      
+      if(algo.chains) {
+        algo.chains.forEach(c => {
+          const div = document.createElement('div');
+          div.className = 'chain-card';
+          div.innerHTML = `<b>${c.name}</b><p>${c.why}</p><span class="lang">${c.lang}</span>`;
+          grid.appendChild(div);
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td><b>${c.name}</b></td><td><span class="mono" style="color:var(--amber)">${c.lang}</span></td>`;
+          tbody.appendChild(tr);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

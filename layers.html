@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Layer Classification — Consensus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .layer-diagram {
+      display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 30px;
+      background: rgba(211,47,47,0.02); border-radius: 12px; border: 1px solid var(--line);
+    }
+    .l2-box {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%;
+    }
+    .l2-item {
+      background: rgba(255,183,0,0.1); border: 1px solid var(--amber); color: var(--amber);
+      padding: 15px 25px; border-radius: 8px; font-family: 'Inter'; font-weight: 600; text-align: center;
+      flex: 1; min-width: 120px; max-width: 200px;
+    }
+    .arrow-down {
+      width: 2px; height: 30px; background: var(--cyan); position: relative;
+    }
+    .arrow-down::after {
+      content: ''; position: absolute; bottom: -5px; left: -4px; width: 0; height: 0;
+      border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--cyan);
+    }
+    .l1-box {
+      background: rgba(211,47,47,0.1); border: 2px solid var(--cyan); color: var(--cyan);
+      padding: 20px; border-radius: 8px; width: 100%; max-width: 600px; text-align: center;
+      font-family: 'Orbitron'; font-size: 1.2rem; font-weight: 700;
+    }
+    .algo-layer-card {
+      background: var(--panel2); border: 1px solid var(--line); border-left: 3px solid var(--cyan);
+      padding: 20px; border-radius: 8px; margin-bottom: 16px;
+    }
+    .algo-layer-card h4 { color: var(--cyan); margin-bottom: 8px; font-size: 1.1rem;}
+    .algo-layer-card p { margin: 0; color: var(--ink-dim); font-size: 0.95rem; line-height: 1.6;}
+  </style>
+</head>
+<body>
+  <div class="page-container reveal in">
+    <div class="page-header">
+      <div class="pill mono l2" style="display:inline-block; margin-bottom: 12px; border-color: var(--amber); color: var(--amber);">// GLOBAL VIEW</div>
+      <h1>Layer Classification</h1>
+      <p>Understanding whether a blockchain operates at Layer 1 (base chain) or Layer 2 (scaling solution built on top).</p>
+    </div>
+
+    <div class="panel">
+      <div class="text-content">
+        <h4>What is Layer 1?</h4>
+        <p>Layer 1 is the <b>main blockchain</b>. It is responsible for Consensus, Block creation, Security, and maintaining the Native cryptocurrency. They have their own nodes, validators, and consensus algorithms.</p>
+
+        <h4>What is Layer 2?</h4>
+        <p>Layer 2 is built <b>on top of</b> Layer 1. Its purpose is to increase TPS (Transactions Per Second) and reduce gas fees. Layer 2 does <b>NOT</b> create its own independent consensus for the base chain. Instead, it bundles transactions and inherits security from Layer 1.</p>
+        
+        <div class="layer-diagram" style="margin: 30px 0;">
+          <div style="font-family: 'Share Tech Mono'; color: var(--amber); margin-bottom: -10px;">LAYER 2 SCALING (Rollups, Channels)</div>
+          <div class="l2-box">
+            <div class="l2-item">Arbitrum</div>
+            <div class="l2-item">Optimism</div>
+            <div class="l2-item">Base</div>
+            <div class="l2-item">zkSync</div>
+          </div>
+          <div class="arrow-down"></div>
+          <div class="l1-box">LAYER 1 BASE CHAIN (Ethereum)</div>
+          <div style="font-family: 'Share Tech Mono'; color: var(--cyan); margin-top: -10px;">Provides Security & Consensus (PoS)</div>
+        </div>
+
+        <div class="divider" style="margin: 30px 0; max-width: 100%;"></div>
+
+        <h4>Algorithm Layer Breakdown</h4>
+        <p style="margin-bottom: 20px;">All 10 consensus algorithms in our explorer are <b>Layer 1 mechanisms</b> because they are designed to establish ground-truth security and block production. Here is exactly how they operate at Layer 1:</p>
+
+        <div class="algo-layer-card">
+          <h4>1. Proof of Work (PoW) - Layer 1</h4>
+          <p>Operates as the foundational security layer (e.g., Bitcoin). It creates the base blocks through hash power. Layer 2s (like Lightning Network) sit on top of PoW to handle fast payments without touching the slow Layer 1 consensus every time.</p>
+        </div>
+        
+        <div class="algo-layer-card">
+          <h4>2. Proof of Stake (PoS) - Layer 1</h4>
+          <p>Secures the base chain (e.g., Ethereum) through economic collateral (staked ETH). It finalizes the blocks. Layer 2 rollups (Arbitrum, Optimism) process transactions off-chain and submit the final state to this PoS Layer 1 for permanent validation.</p>
+        </div>
+
+        <div class="algo-layer-card">
+          <h4>3. Delegated Proof of Stake (DPoS) - Layer 1</h4>
+          <p>Operates as the base layer for chains like EOS and TRON. Because DPoS is already highly scalable and fast (via elected delegates), these Layer 1s rarely need Layer 2 scaling solutions to handle their transaction load.</p>
+        </div>
+
+        <div class="algo-layer-card">
+          <h4>4. Proof of Authority (PoA) - Layer 1</h4>
+          <p>Used as the base layer consensus for enterprise or consortium chains (e.g., VeChain). Pre-approved validators create the base blocks. It provides the ultimate source of truth for the consortium network.</p>
+        </div>
+
+        <div class="algo-layer-card">
+          <h4>5. Proof of History (PoH) - Layer 1</h4>
+          <p>Solana uses PoH alongside PoS at Layer 1 to create an extremely fast base chain. By acting as a cryptographic clock at the base level, it attempts to provide Layer 2-like speeds natively on Layer 1 without needing external scaling layers.</p>
+        </div>
+
+        <div class="algo-layer-card">
+          <h4>6. Practical Byzantine Fault Tolerance (PBFT) - Layer 1</h4>
+          <p>Used by networks like Hyperledger Fabric. It provides immediate finality at the base layer. Since blocks are finalized the moment they are created, it serves as an ironclad Layer 1 for permissioned networks.</p>
+        </div>
+
+        <div class="algo-layer-card">
+          <h4>7. Proof of Space / Capacity (PoSpace) - Layer 1</h4>
+          <p>Chains like Chia use this to secure the base ledger. Disk space replaces hash power to write the Layer 1 blocks. Any future scaling would require building a Layer 2 network on top of Chia's base PoSpace consensus.</p>
+        </div>
+
+        <div class="algo-layer-card">
+          <h4>8. Proof of Burn (PoB) - Layer 1</h4>
+          <p>Operates at the base layer by requiring users to burn coins to buy virtual mining rigs. This virtual power is used to validate and append the ground-truth blocks of the network.</p>
+        </div>
+
+        <div class="algo-layer-card">
+          <h4>9. Proof of Elapsed Time (PoET) - Layer 1</h4>
+          <p>Uses trusted hardware (Intel SGX) to randomly select block producers for the base layer of permissioned chains (like Hyperledger Sawtooth). It dictates the core consensus of the entire system.</p>
+        </div>
+
+        <div class="algo-layer-card">
+          <h4>10. Proof of Importance (PoI) - Layer 1</h4>
+          <p>NEM uses PoI to secure its base chain. The algorithm calculates importance scores to decide who harvests the next Layer 1 block, completely defining the network's ground security.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built as an educational explorer · consensus data is simplified for teaching purposes
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="layout.js"></script>
+</body>
+</html>

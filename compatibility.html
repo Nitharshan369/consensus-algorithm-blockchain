@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compatibility Matrix — Consensus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-container reveal in">
+    <div class="page-header">
+      <div class="pill mono l2" style="display:inline-block; margin-bottom: 12px; border-color: var(--amber); color: var(--amber);">// GLOBAL VIEW</div>
+      <h1>Consensus Family Compatibility Matrix (Educational View)</h1>
+      <p>Two blockchains using the same consensus mechanism are not automatically interoperable or protocol-compatible. This matrix compares <b>consensus families</b> to show consensus philosophy similarity.</p>
+    </div>
+
+    <div class="panel">
+      <div class="text-content" style="margin-bottom: 20px;">
+        <p>Suppose Bitcoin uses PoW and Ethereum uses PoS. Can they validate each other's blocks? No, their consensus rules are different (Protocol Compatibility ❌).</p>
+        <p>However, Ethereum (PoS) and Cardano (PoS) both use the Proof of Stake family. They have similar consensus philosophy (Consensus Compatibility 🟩). It does <b>NOT</b> mean they can directly transfer coins.</p>
+      </div>
+
+      <div class="chip-row" id="matrixChips"></div>
+      
+      <div class="matrix-scroll">
+        <table class="matrix" id="matrixTable"></table>
+      </div>
+      
+      <div class="matrix-legend">
+        <span><span class="swatch" style="background:var(--red)"></span> <span style="color:var(--red)">■</span> Active Selection Highlight</span>
+        <span><span class="swatch" style="background:rgba(57,255,136,.3)"></span> 🟩 Compatible — Same consensus family</span>
+        <span><span class="swatch" style="background:rgba(255,56,96,.15)"></span> 🟥 Incompatible — Different consensus family</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built as an educational explorer · consensus data is simplified for teaching purposes
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="layout.js"></script>
+  <script>
+    const MATRIX_CHAINS = [
+      {name:'Bitcoin', algo:'pow'},
+      {name:'Ethereum', algo:'pos'},
+      {name:'Cardano', algo:'pos'},
+      {name:'Solana', algo:'poh'},
+      {name:'EOS', algo:'dpos'},
+      {name:'VeChain', algo:'poa'},
+      {name:'Hyperledger Fabric', algo:'pbft'},
+      {name:'Chia', algo:'pospace'},
+      {name:'Slimcoin', algo:'pob'},
+      {name:'Hyperledger Sawtooth', algo:'poet'},
+      {name:'NEM', algo:'poi'}
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const chips = document.getElementById('matrixChips');
+      ALGOS.forEach(a => {
+        const chip = document.createElement('button');
+        chip.className = 'chip';
+        chip.textContent = a.code;
+        chip.dataset.algo = a.id;
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          highlightMatrix(a.id);
+        });
+        chips.appendChild(chip);
+      });
+
+      buildMatrix();
+    });
+
+    function buildMatrix() {
+      const table = document.getElementById('matrixTable');
+      let html = '<tr><th></th>';
+      MATRIX_CHAINS.forEach(c => html += `<th>${c.name}</th>`);
+      html += '</tr>';
+      
+      MATRIX_CHAINS.forEach((row, i) => {
+        html += `<tr><th class="rowhead">${row.name}</th>`;
+        MATRIX_CHAINS.forEach((col, j) => {
+          let cls = '';
+          let icon = '';
+          if (i === j) {
+            cls = 'self';
+            icon = '🟩';
+          } else if (row.algo === col.algo) {
+            cls = 'compat';
+            icon = '🟩';
+          } else {
+            cls = 'incompat';
+            icon = '🟥';
+          }
+          html += `<td class="${cls}" data-row="${row.algo}" data-col="${col.algo}">${icon}</td>`;
+        });
+        html += '</tr>';
+      });
+      table.innerHTML = html;
+    }
+
+    function highlightMatrix(algoId) {
+      document.querySelectorAll('#matrixTable td').forEach(td => {
+        const involved = td.dataset.row === algoId || td.dataset.col === algoId;
+        td.style.outline = involved ? '2px solid var(--red)' : 'none';
+        td.classList.toggle('dimmed', !involved);
+      });
+      document.querySelectorAll('#matrixTable th.rowhead').forEach((th, i) => {
+        const rowData = MATRIX_CHAINS[i];
+        if(rowData.algo === algoId) {
+          th.style.color = 'var(--red)';
+        } else {
+          th.style.color = 'var(--ink-dim)';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

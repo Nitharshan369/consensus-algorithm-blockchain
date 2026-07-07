@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Performance & Pros/Cons — Consensus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .pros-cons {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;
+    }
+    @media (max-width: 640px) { .pros-cons { grid-template-columns: 1fr; } }
+    .pro-box { border-left: 3px solid var(--green); background: rgba(57,255,136,0.05); padding: 16px; border-radius: 4px; }
+    .con-box { border-left: 3px solid var(--red); background: rgba(255,56,96,0.05); padding: 16px; border-radius: 4px; }
+    .list-item { margin-bottom: 8px; font-size: 0.95rem; color: var(--ink-dim); display: flex; align-items: flex-start; gap: 8px; }
+    .pro-icon { color: var(--green); font-weight: bold; }
+    .con-icon { color: var(--red); font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="page-container reveal in">
+    <div class="multi-col">
+      <!-- Sidebar injected by layout.js -->
+      <div id="algoRail" class="sidebar"></div>
+
+      <!-- Main Content -->
+      <div class="panel-stack" style="width: 100%;">
+        
+        <div class="panel">
+          <div class="panel-title">
+            <h3>Performance Comparison</h3>
+          </div>
+          <table class="data-table" id="perfTable">
+            <tbody>
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">
+            <h3>Advantages & Disadvantages</h3>
+          </div>
+          <div class="pros-cons">
+            <div class="pro-box">
+              <h4 style="color:var(--green); margin-bottom:12px; margin-top:0;">Advantages</h4>
+              <div id="prosList"></div>
+            </div>
+            <div class="con-box">
+              <h4 style="color:var(--red); margin-bottom:12px; margin-top:0;">Disadvantages</h4>
+              <div id="consList"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">
+            <h3>Summary Overview</h3>
+          </div>
+          <div class="stats-grid" id="summaryGrid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built as an educational explorer · consensus data is simplified for teaching purposes
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const algo = getSelectedAlgo();
+      document.title = `${algo.name} Performance — Consensus Explorer`;
+      
+      // Performance
+      const perfTbody = document.querySelector('#perfTable tbody');
+      if(algo.performance) {
+        perfTbody.innerHTML = `
+          <tr><th style="width: 30%">TPS</th><td>${algo.performance.tps}</td></tr>
+          <tr><th>Block Time</th><td>${algo.performance.blockTime}</td></tr>
+          <tr><th>Finality</th><td>${algo.performance.finality}</td></tr>
+          <tr><th>Energy Usage</th><td style="color:${algo.performance.energy.includes('Low') ? 'var(--green)' : 'var(--red)'}">${algo.performance.energy}</td></tr>
+          <tr><th>Latency</th><td>${algo.performance.latency}</td></tr>
+        `;
+      }
+
+      // Pros
+      const prosList = document.getElementById('prosList');
+      if(algo.pros) {
+        algo.pros.forEach(p => {
+          prosList.innerHTML += `<div class="list-item"><span class="pro-icon">✔</span> <span>${p}</span></div>`;
+        });
+      }
+
+      // Cons
+      const consList = document.getElementById('consList');
+      if(algo.cons) {
+        algo.cons.forEach(c => {
+          consList.innerHTML += `<div class="list-item"><span class="con-icon">✘</span> <span>${c}</span></div>`;
+        });
+      }
+
+      // Summary
+      const sumGrid = document.getElementById('summaryGrid');
+      if(algo.summary) {
+        const s = algo.summary;
+        sumGrid.innerHTML = `
+          <div class="stat-card"><span class="label">Mining</span><span class="val" style="font-size:1.1rem">${s.mining}</span></div>
+          <div class="stat-card"><span class="label">Validators</span><span class="val" style="font-size:1.1rem">${s.validators}</span></div>
+          <div class="stat-card"><span class="label">Voting</span><span class="val" style="font-size:1.1rem">${s.voting}</span></div>
+          <div class="stat-card"><span class="label">Speed</span><span class="val" style="font-size:1.1rem; color:${s.speed.includes('High') ? 'var(--green)' : 'var(--amber)'}">${s.speed}</span></div>
+          <div class="stat-card"><span class="label">Security</span><span class="val" style="font-size:1.1rem">${s.security}</span></div>
+          <div class="stat-card"><span class="label">Decentralization</span><span class="val" style="font-size:1.1rem">${s.decentralization}</span></div>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

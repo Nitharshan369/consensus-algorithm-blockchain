@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Working Flow — Consensus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-container reveal in">
+    <div class="multi-col">
+      <!-- Sidebar injected by layout.js -->
+      <div id="algoRail" class="sidebar"></div>
+
+      <!-- Main Content -->
+      <div class="panel-stack" style="width: 100%;">
+        
+        <div class="panel">
+          <div class="panel-title">
+            <h3>Live Simulation</h3>
+            <span class="pill mono" id="vizTag">MECHANISM</span>
+          </div>
+          <div class="viz-wrap">
+            <canvas id="algoCanvas"></canvas>
+          </div>
+          <div class="viz-caption" id="vizCaption">Watch the protocol run in real time.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">
+            <h3>Step-by-Step Flow</h3>
+          </div>
+          <ol class="steps" id="ovSteps"></ol>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built as an educational explorer · consensus data is simplified for teaching purposes
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="layout.js"></script>
+  <script src="animations.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const algo = getSelectedAlgo();
+      document.title = `${algo.name} Flow — Consensus Explorer`;
+      
+      const ol = document.getElementById('ovSteps');
+      ol.innerHTML = '';
+      if(algo.steps) {
+        algo.steps.forEach(s => {
+          const li = document.createElement('li');
+          li.textContent = s;
+          ol.appendChild(li);
+        });
+      }
+      
+      document.getElementById('vizTag').textContent = algo.vizTag || 'MECHANISM';
+      document.getElementById('vizCaption').textContent = algo.vizCaption || 'Watch the protocol run in real time.';
+
+      // The animations.js script defines setVizAlgo, we call it to start the animation for the selected algo
+      if(typeof setVizAlgo === 'function') {
+        setVizAlgo(algo);
+      }
+    });
+  </script>
+</body>
+</html>

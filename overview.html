@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mechanism Overview — Consensus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-container reveal in">
+    <div class="multi-col">
+      <!-- Sidebar injected by layout.js -->
+      <div id="algoRail" class="sidebar"></div>
+
+      <!-- Main Content -->
+      <div class="panel-stack" style="width: 100%;">
+        <div class="panel">
+          <div class="panel-title">
+            <h3 id="ovName">—</h3>
+            <span class="pill" id="ovLayer">LAYER</span>
+          </div>
+          <p id="ovMechanism" class="text-content" style="font-size: 1.05rem; margin-bottom: 20px;"></p>
+          <div style="background: rgba(0,240,255,0.05); padding: 16px; border-left: 3px solid var(--cyan); border-radius: 4px;">
+            <p id="ovExplain" style="color: var(--cyan); font-style: italic; margin: 0;"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built as an educational explorer · consensus data is simplified for teaching purposes
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const algo = getSelectedAlgo();
+      document.title = `${algo.name} Overview — Consensus Explorer`;
+      document.getElementById('ovName').textContent = `${algo.name} (${algo.code})`;
+      document.getElementById('ovLayer').textContent = algo.layer + ' — Base Chain';
+      document.getElementById('ovLayer').className = 'pill ' + (algo.layer === 'L1' ? 'l1' : 'l2');
+      document.getElementById('ovMechanism').textContent = algo.mechanism;
+      document.getElementById('ovExplain').textContent = algo.explain;
+    });
+  </script>
+</body>
+</html>

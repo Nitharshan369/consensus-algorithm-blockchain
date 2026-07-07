@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algorithm Details — Consensus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+    @media (max-width: 640px) { .pros-cons { grid-template-columns: 1fr; } }
+    .pro-box { border-left: 3px solid var(--green); background: rgba(57,255,136,0.05); padding: 16px; border-radius: 4px; }
+    .con-box { border-left: 3px solid var(--red); background: rgba(255,56,96,0.05); padding: 16px; border-radius: 4px; }
+    .list-item { margin-bottom: 8px; font-size: 0.95rem; color: var(--ink-dim); display: flex; align-items: flex-start; gap: 8px; }
+    .pro-icon { color: var(--green); font-weight: bold; }
+    .con-icon { color: var(--red); font-weight: bold; }
+
+    /* Interactive Demo Styles */
+    .demo-wrap { background: var(--bg2); border: 1px solid var(--line); border-radius: 8px; padding: 20px; position: relative; overflow: hidden; min-height: 400px;}
+    .demo-block { background: var(--panel); border: 2px solid var(--cyan); border-radius: 8px; padding: 20px; margin-bottom: 16px; transition: border-color 0.3s; }
+    .demo-block.invalid { border-color: var(--red); box-shadow: 0 0 15px rgba(255,56,96,0.1); }
+    .demo-row { display: flex; align-items: center; margin-bottom: 12px; gap: 10px; }
+    .demo-label { font-family: 'Share Tech Mono'; width: 80px; color: var(--ink-dim); flex-shrink: 0;}
+    .demo-input { flex-grow: 1; background: var(--bg); border: 1px solid var(--line); color: var(--cyan); padding: 8px; border-radius: 4px; font-family: 'Share Tech Mono'; }
+    .demo-textarea { width: 100%; height: 60px; background: var(--bg); border: 1px solid var(--line); color: var(--ink); padding: 8px; border-radius: 4px; font-family: 'Inter'; resize: vertical; margin-bottom: 12px;}
+    .demo-btn { background: rgba(211,47,47,0.05); border: 1px solid var(--cyan); color: var(--cyan); padding: 10px 20px; border-radius: 6px; cursor: pointer; font-family: 'Inter'; font-weight: 600; transition: all 0.2s; }
+    .demo-btn:hover { background: var(--cyan); color: #ffffff; }
+    .demo-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .demo-message { padding: 12px; border-radius: 4px; margin-top: 16px; font-family: 'Share Tech Mono'; display: none; }
+    .demo-message.success { background: rgba(57,255,136,0.1); border: 1px solid var(--green); color: var(--green); display: block; }
+    .demo-message.error { background: rgba(255,56,96,0.1); border: 1px solid var(--red); color: var(--red); display: block; }
+  </style>
+</head>
+<body>
+  <div class="page-container reveal in">
+    <div class="multi-col">
+      <!-- Sidebar injected by layout.js -->
+      <div id="algoRail" class="sidebar"></div>
+
+      <!-- Main Content -->
+      <div style="width: 100%;">
+        
+        <div class="page-header" style="margin-bottom: 20px;">
+          <h1 id="ovName">—</h1>
+          <div class="pill" id="ovLayer" style="display:inline-block; margin-top: 10px;">LAYER</div>
+        </div>
+
+        <div class="algo-tabs">
+          <button class="active" onclick="switchTab('tab-overview')">Overview</button>
+          <button onclick="switchTab('tab-flow')">Flowchart & Canvas</button>
+          <button onclick="switchTab('tab-demo')">Interactive Demo</button>
+          <button onclick="switchTab('tab-trilemma')">Trilemma</button>
+          <button onclick="switchTab('tab-mapping')">Mapping</button>
+          <button onclick="switchTab('tab-classification')">Classification</button>
+          <button onclick="switchTab('tab-matrix')">Compatibility</button>
+          <button onclick="switchTab('tab-performance')">Performance</button>
+        </div>
+
+        <!-- TAB: Overview -->
+        <div id="tab-overview" class="tab-content active">
+          <div class="panel">
+            <div class="panel-title"><h3>Mechanism Explanation</h3></div>
+            <p id="ovMechanism" class="text-content" style="font-size: 1.05rem; margin-bottom: 20px;"></p>
+            <div style="background: rgba(0,240,255,0.05); padding: 16px; border-left: 3px solid var(--cyan); border-radius: 4px;">
+              <p id="ovExplain" style="color: var(--cyan); font-style: italic; margin: 0;"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Flowchart & Canvas -->
+        <div id="tab-flow" class="tab-content">
+          <div class="panel">
+            <div class="panel-title">
+              <h3>Live Simulation</h3>
+              <span class="pill mono" id="vizTag">MECHANISM</span>
+            </div>
+            <div class="viz-wrap">
+              <canvas id="algoCanvas"></canvas>
+            </div>
+            <div class="viz-caption" id="vizCaption">Watch the protocol run in real time.</div>
+          </div>
+          <div class="panel">
+            <div class="panel-title"><h3>Step-by-Step Flowchart</h3></div>
+            <ol class="flowchart-steps" id="ovSteps"></ol>
+          </div>
+        </div>
+
+        <!-- TAB: Interactive Demo -->
+        <div id="tab-demo" class="tab-content">
+          <div class="panel">
+            <div class="panel-title">
+              <h3>Interactive Educational Demo</h3>
+              <span class="pill mono" style="color:var(--magenta); border-color:var(--magenta);">SIMULATION</span>
+            </div>
+            <p class="text-content" style="margin-bottom: 20px;" id="demoDescription">Try out the simplified consensus logic below.</p>
+            <div class="demo-wrap" id="demoContainer">
+              <!-- Rendered by demo.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Trilemma -->
+        <div id="tab-trilemma" class="tab-content">
+          <div class="panel">
+            <div class="panel-title"><h3>Trilemma Scorecard</h3></div>
+            <div class="trilemma-wrap" style="margin-bottom: 30px;">
+              <svg id="radarSvg" viewBox="0 0 220 220" width="220" height="220"></svg>
+              <div>
+                <div class="stat-rows">
+                  <div class="stat-row scal"><b><span>Scalability</span><span id="scalVal"></span></b><div class="bar-track"><div class="bar-fill" id="scalBar"></div></div></div>
+                  <div class="stat-row sec"><b><span>Security</span><span id="secVal"></span></b><div class="bar-track"><div class="bar-fill" id="secBar"></div></div></div>
+                  <div class="stat-row dec"><b><span>Decentralisation</span><span id="decVal"></span></b><div class="bar-track"><div class="bar-fill" id="decBar"></div></div></div>
+                </div>
+                <div class="metric-line">
+                  <div><b id="blockTimeVal">—</b>Block time</div>
+                  <div><b id="tpsVal">—</b>Approx. TPS</div>
+                  <div><b id="attackVal">—</b>Main attack</div>
+                </div>
+                <div id="trilemmaNote" style="color: var(--cyan); margin-top: 20px; font-style: italic;"></div>
+              </div>
+            </div>
+            
+            <div class="panel-title"><h3>Ratings & Explanation</h3></div>
+            <table class="data-table" id="trilemmaTable">
+              <thead><tr><th>Property</th><th>Rating (out of 5)</th><th>Explanation</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div id="trilemmaSummary" style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.01); border-radius: 8px; border: 1px dashed var(--line); color: var(--ink-dim);"></div>
+          </div>
+        </div>
+
+        <!-- TAB: Mapping -->
+        <div id="tab-mapping" class="tab-content">
+          <div class="panel">
+            <div class="panel-title"><h3>Real-World Blockchain & Cryptocurrency Mapping</h3></div>
+            <div class="chain-grid" id="chainGrid"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title"><h3>Smart Contract Language Support</h3></div>
+            <table class="data-table" id="langTable" style="margin-bottom: 20px;">
+              <thead><tr><th>Blockchain</th><th>Smart Contract Language</th><th>Relation to Consensus</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div id="smartContractNote" style="padding: 16px; background: rgba(255,145,0,0.05); border-left: 4px solid var(--amber); border-radius: 4px; color: var(--ink-dim); font-size: 0.95rem;"></div>
+          </div>
+          <div class="panel" id="mappingInfoPanel" style="display:none;">
+            <div class="panel-title"><h3>Additional Mapping Information</h3></div>
+            <div id="mappingInfoWrap" style="display:flex; flex-direction:column; gap: 15px;"></div>
+          </div>
+        </div>
+
+        <!-- TAB: Classification -->
+        <div id="tab-classification" class="tab-content">
+          <div class="panel">
+            <div class="panel-title"><h3>Layer Classification</h3></div>
+            <div id="layerClassWrap"></div>
+          </div>
+        </div>
+
+        <!-- TAB: Compatibility Matrix -->
+        <div id="tab-matrix" class="tab-content">
+          <div class="panel">
+            <div class="panel-title"><h3>Compatibility Matrix</h3></div>
+            <p style="margin-bottom:20px; color:var(--ink-dim);">Blockchains are considered <b>compatible at the consensus level</b> if they use the same consensus mechanism.</p>
+            <table class="data-table" id="compatTable">
+              <thead><tr><th>Blockchain</th><th>Consensus</th><th>Compatible?</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB: Performance -->
+        <div id="tab-performance" class="tab-content">
+          <div class="panel">
+            <div class="panel-title"><h3>Performance Metrics</h3></div>
+            <table class="data-table" id="perfTable" style="margin-bottom: 30px;"><tbody></tbody></table>
+
+            <div class="panel-title"><h3>Summary Overview</h3></div>
+            <div class="stats-grid" id="summaryGrid" style="margin-bottom: 30px;"></div>
+            
+            <div class="panel-title"><h3>Key Takeaway</h3></div>
+            <div id="takeawayWrap" style="background: rgba(211,47,47,0.03); border: 1px solid var(--line); border-radius: 8px; padding: 24px; font-size: 1.05rem; line-height: 1.6; color: var(--ink);"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title"><h3>Advantages & Disadvantages</h3></div>
+            <div class="pros-cons">
+              <div class="pro-box"><h4 style="color:var(--green); margin-bottom:12px; margin-top:0;">Pros</h4><div id="prosList"></div></div>
+              <div class="con-box"><h4 style="color:var(--red); margin-bottom:12px; margin-top:0;">Cons</h4><div id="consList"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built as an educational explorer · consensus data is simplified for teaching purposes
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="layout.js"></script>
+  <script src="animations.js"></script>
+  <script src="demo.js"></script>
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.algo-tabs button').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      
+      // Fix: Canvas dimensions are 0 when hidden. Resize it when shown!
+      if (tabId === 'tab-flow' && typeof resizeCanvas === 'function') {
+        resizeCanvas();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const algo = getSelectedAlgo();
+      document.title = `${algo.name} — Consensus Explorer`;
+      
+      // Overview
+      document.getElementById('ovName').textContent = `${algo.name} (${algo.code})`;
+      document.getElementById('ovLayer').textContent = algo.layer + ' — Base Chain';
+      document.getElementById('ovLayer').className = 'pill ' + (algo.layer === 'L1' ? 'l1' : 'l2');
+      document.getElementById('ovMechanism').innerHTML = algo.mechanism;
+      document.getElementById('ovExplain').innerHTML = algo.explain;
+
+      // Flowchart
+      const ol = document.getElementById('ovSteps');
+      if(algo.steps) {
+        algo.steps.forEach(s => {
+          const li = document.createElement('li');
+          li.textContent = s;
+          ol.appendChild(li);
+        });
+      }
+      document.getElementById('vizTag').textContent = algo.vizTag || 'MECHANISM';
+      document.getElementById('vizCaption').textContent = algo.vizCaption || 'Watch the protocol run in real time.';
+
+      // Trilemma
+      const t = algo.trilemma;
+      if (t) {
+        document.getElementById('scalVal').textContent = t.scal+'/10';
+        document.getElementById('secVal').textContent = t.sec+'/10';
+        document.getElementById('decVal').textContent = t.dec+'/10';
+        document.getElementById('scalBar').style.width = (t.scal*10)+'%';
+        document.getElementById('secBar').style.width = (t.sec*10)+'%';
+        document.getElementById('decBar').style.width = (t.dec*10)+'%';
+        document.getElementById('blockTimeVal').textContent = t.blockTime;
+        document.getElementById('tpsVal').textContent = t.tps;
+        document.getElementById('attackVal').textContent = t.attack;
+        document.getElementById('trilemmaNote').innerHTML = algo.explain;
+        if(typeof drawRadar === 'function') drawRadar(t);
+      }
+      
+      const ttbody = document.querySelector('#trilemmaTable tbody');
+      if(algo.trilemmaTable) {
+        algo.trilemmaTable.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td><b>${row.prop}</b></td><td><span style="color:var(--amber);">${row.rating}</span></td><td>${row.exp}</td>`;
+          ttbody.appendChild(tr);
+        });
+      }
+      if(algo.trilemmaSummary) {
+        document.getElementById('trilemmaSummary').innerHTML = algo.trilemmaSummary;
+      }
+
+      // Mapping
+      const grid = document.getElementById('chainGrid');
+      const tbody = document.querySelector('#langTable tbody');
+      if(algo.chains) {
+        algo.chains.forEach(c => {
+          const div = document.createElement('div');
+          div.className = 'chain-card';
+          div.innerHTML = `<b>${c.name}</b><p>${c.why}</p>`;
+          grid.appendChild(div);
+        });
+      }
+      if(algo.smartContracts) {
+        algo.smartContracts.forEach(sc => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td><b>${sc.chain}</b></td><td><span class="mono" style="color:var(--amber)">${sc.lang}</span></td><td>${sc.rel}</td>`;
+          tbody.appendChild(tr);
+        });
+      }
+      if(algo.smartContractNote) {
+        document.getElementById('smartContractNote').innerHTML = algo.smartContractNote;
+        document.getElementById('smartContractNote').style.display = 'block';
+      } else {
+        document.getElementById('smartContractNote').style.display = 'none';
+      }
+      
+      const mapInfoPanel = document.getElementById('mappingInfoPanel');
+      const mapInfoWrap = document.getElementById('mappingInfoWrap');
+      if(algo.mappingAdditionalInfo) {
+        mapInfoWrap.innerHTML = algo.mappingAdditionalInfo.map(info => 
+          `<div style="background:rgba(255,255,255,0.02); padding:16px; border-radius:6px; border:1px solid var(--line);">
+            <h4 style="color:var(--cyan); margin-top:0; margin-bottom:10px;">${info.title}</h4>
+            <p style="margin:0; font-size:0.95rem; line-height:1.5;">${info.text}</p>
+          </div>`
+        ).join('');
+        mapInfoPanel.style.display = 'block';
+      } else {
+        mapInfoPanel.style.display = 'none';
+      }
+
+      // Classification
+      const layerWrap = document.getElementById('layerClassWrap');
+      if (algo.layerClassification) {
+        let examplesList = algo.layerClassification.examples.map(e => `<li>${e}</li>`).join('');
+        layerWrap.innerHTML = `
+          <h4 style="color:var(--cyan); margin-bottom:10px; font-family:'Orbitron'; font-size: 1.2rem;">${algo.layerClassification.layer}</h4>
+          <p style="font-size: 1.05rem;">${algo.layerClassification.description}</p>
+          <h5 style="margin-top:20px; font-size:1rem; color:var(--ink);">Examples:</h5>
+          <ul style="margin: 10px 0; padding-left: 20px; color:var(--ink-dim);">${examplesList}</ul>
+          <hr style="border-top:1px dashed var(--line); margin: 25px 0;">
+          <h5 style="color:var(--cyan); margin-top:20px; font-size: 1.1rem;">Why not Layer 2?</h5>
+          <p style="font-size: 1.05rem;">${algo.layerClassification.whyNotLayer2}</p>
+        `;
+      } else {
+        layerWrap.innerHTML = `<p style="color:var(--ink-dim)">Classification data not available yet.</p>`;
+      }
+
+      // Compatibility Matrix
+      const compatTbody = document.querySelector('#compatTable tbody');
+      if (algo.compatibility) {
+        algo.compatibility.forEach(c => {
+          const tr = document.createElement('tr');
+          const status = c.compatible ? '<span style="color:var(--green); font-weight:bold;">✅ Yes</span>' : '<span style="color:var(--red); font-weight:bold;">❌ No</span>';
+          tr.innerHTML = `<td><b>${c.name}</b></td><td>${c.consensus}</td><td>${status}</td>`;
+          compatTbody.appendChild(tr);
+        });
+      } else {
+        compatTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--ink-dim);">Matrix data not available yet.</td></tr>`;
+      }
+
+      // Performance
+      const perfTbody = document.querySelector('#perfTable tbody');
+      if(algo.performance) {
+        perfTbody.innerHTML = `
+          <tr><th style="width: 30%">TPS</th><td>${algo.performance.tps}</td></tr>
+          <tr><th>Block Time</th><td>${algo.performance.blockTime}</td></tr>
+          <tr><th>Finality</th><td>${algo.performance.finality}</td></tr>
+          <tr><th>Energy Usage</th><td style="color:${algo.performance.energy.includes('Low') ? 'var(--green)' : 'var(--red)'}">${algo.performance.energy}</td></tr>
+          <tr><th>Latency</th><td>${algo.performance.latency}</td></tr>
+        `;
+      }
+      const prosList = document.getElementById('prosList');
+      if(algo.pros) algo.pros.forEach(p => { prosList.innerHTML += `<div class="list-item"><span class="pro-icon">✔</span> <span>${p}</span></div>`; });
+      const consList = document.getElementById('consList');
+      if(algo.cons) algo.cons.forEach(c => { consList.innerHTML += `<div class="list-item"><span class="con-icon">✘</span> <span>${c}</span></div>`; });
+      
+      const sumGrid = document.getElementById('summaryGrid');
+      if(algo.summary) {
+        const s = algo.summary;
+        sumGrid.innerHTML = `
+          <div class="stat-card"><span class="label">Mining</span><span class="val" style="font-size:1.1rem">${s.mining}</span></div>
+          <div class="stat-card"><span class="label">Validators</span><span class="val" style="font-size:1.1rem">${s.validators}</span></div>
+          <div class="stat-card"><span class="label">Voting</span><span class="val" style="font-size:1.1rem">${s.voting}</span></div>
+          <div class="stat-card"><span class="label">Speed</span><span class="val" style="font-size:1.1rem; color:${s.speed.includes('High') ? 'var(--green)' : 'var(--amber)'}">${s.speed}</span></div>
+          <div class="stat-card"><span class="label">Security</span><span class="val" style="font-size:1.1rem">${s.security}</span></div>
+          <div class="stat-card"><span class="label">Decentralization</span><span class="val" style="font-size:1.1rem">${s.decentralization}</span></div>
+        `;
+      }
+      
+      const takeawayWrap = document.getElementById('takeawayWrap');
+      if(algo.takeaway) {
+        takeawayWrap.innerHTML = `<p style="margin:0;">${algo.takeaway}</p>`;
+      } else {
+        takeawayWrap.style.display = 'none';
+      }
+
+      // Initialize Animations and Demos
+      if(typeof setVizAlgo === 'function') setVizAlgo(algo);
+      if(typeof initDemo === 'function') initDemo(algo);
+    });
+
+    function drawRadar(t){
+      const svg = document.getElementById('radarSvg');
+      if(!svg) return;
+      const cx=110, cy=110, R=85;
+      const axes = [
+        {label:'SCAL', val:t.scal, angle:-90},
+        {label:'SEC', val:t.sec, angle:30},
+        {label:'DEC', val:t.dec, angle:150}
+      ];
+      function pt(angleDeg, r){
+        const rad = angleDeg*Math.PI/180;
+        return [cx + r*Math.cos(rad), cy + r*Math.sin(rad)];
+      }
+      let svgContent = '';
+      [0.25,0.5,0.75,1].forEach(f=>{
+        const pts = axes.map(ax=> pt(ax.angle, R*f).join(',')).join(' ');
+        svgContent += `<polygon points="${pts}" fill="none" stroke="#1c2740" stroke-width="1"/>`;
+      });
+      axes.forEach(ax=>{
+        const [x,y] = pt(ax.angle, R);
+        svgContent += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`;
+        const [lx,ly] = pt(ax.angle, R+18);
+        svgContent += `<text x="${lx}" y="${ly}" fill="var(--ink-dim)" font-size="9" font-family="Share Tech Mono" text-anchor="middle" dominant-baseline="middle">${ax.label}</text>`;
+      });
+      const dataPts = axes.map(ax=> pt(ax.angle, R*(ax.val/10)).join(',')).join(' ');
+      svgContent += `<polygon points="${dataPts}" fill="rgba(211,47,47,0.15)" stroke="var(--cyan)" stroke-width="2"/>`;
+      axes.forEach(ax=>{
+        const [x,y] = pt(ax.angle, R*(ax.val/10));
+        svgContent += `<circle cx="${x}" cy="${y}" r="3.5" fill="var(--cyan)"/>`;
+      });
+      svg.innerHTML = svgContent;
+    }
+  </script>
+</body>
+</html>

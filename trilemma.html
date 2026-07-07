@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trilemma Radar — Consensus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-container reveal in">
+    <div class="multi-col">
+      <!-- Sidebar injected by layout.js -->
+      <div id="algoRail" class="sidebar"></div>
+
+      <!-- Main Content -->
+      <div class="panel-stack" style="width: 100%;">
+        
+        <div class="panel">
+          <div class="panel-title">
+            <h3>Trilemma Scorecard</h3>
+            <span class="pill mono l1">ANALYSIS</span>
+          </div>
+          <div class="text-content" style="margin-bottom: 20px;">
+            <p>The <b>Blockchain Trilemma</b> states that a blockchain network can only optimize for two out of the three main features: Scalability, Security, and Decentralization. Every consensus algorithm makes trade-offs.</p>
+          </div>
+          <div class="trilemma-wrap">
+            <svg id="radarSvg" viewBox="0 0 220 220" width="220" height="220"></svg>
+            <div>
+              <div class="stat-rows">
+                <div class="stat-row scal"><b><span>Scalability</span><span id="scalVal"></span></b><div class="bar-track"><div class="bar-fill" id="scalBar"></div></div></div>
+                <div class="stat-row sec"><b><span>Security</span><span id="secVal"></span></b><div class="bar-track"><div class="bar-fill" id="secBar"></div></div></div>
+                <div class="stat-row dec"><b><span>Decentralisation</span><span id="decVal"></span></b><div class="bar-track"><div class="bar-fill" id="decBar"></div></div></div>
+              </div>
+              <div class="metric-line">
+                <div><b id="blockTimeVal">—</b>Block time</div>
+                <div><b id="tpsVal">—</b>Approx. TPS</div>
+                <div><b id="attackVal">—</b>Main attack vector</div>
+              </div>
+              <div id="trilemmaNote">Scores are 1–10 illustrative ratings for comparison, not audited metrics.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built as an educational explorer · consensus data is simplified for teaching purposes
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const algo = getSelectedAlgo();
+      document.title = `${algo.name} Trilemma — Consensus Explorer`;
+      
+      const t = algo.trilemma;
+      if (t) {
+        document.getElementById('scalVal').textContent = t.scal+'/10';
+        document.getElementById('secVal').textContent = t.sec+'/10';
+        document.getElementById('decVal').textContent = t.dec+'/10';
+        document.getElementById('scalBar').style.width = (t.scal*10)+'%';
+        document.getElementById('secBar').style.width = (t.sec*10)+'%';
+        document.getElementById('decBar').style.width = (t.dec*10)+'%';
+        document.getElementById('blockTimeVal').textContent = t.blockTime;
+        document.getElementById('tpsVal').textContent = t.tps;
+        document.getElementById('attackVal').textContent = t.attack;
+        drawRadar(t);
+      }
+    });
+
+    function drawRadar(t){
+      const svg = document.getElementById('radarSvg');
+      const cx=110, cy=110, R=85;
+      const axes = [
+        {label:'SCAL', val:t.scal, angle:-90},
+        {label:'SEC', val:t.sec, angle:30},
+        {label:'DEC', val:t.dec, angle:150}
+      ];
+      function pt(angleDeg, r){
+        const rad = angleDeg*Math.PI/180;
+        return [cx + r*Math.cos(rad), cy + r*Math.sin(rad)];
+      }
+      let svgContent = '';
+      // rings
+      [0.25,0.5,0.75,1].forEach(f=>{
+        const pts = axes.map(ax=> pt(ax.angle, R*f).join(',')).join(' ');
+        svgContent += `<polygon points="${pts}" fill="none" stroke="#1c2740" stroke-width="1"/>`;
+      });
+      // axis lines + labels
+      axes.forEach(ax=>{
+        const [x,y] = pt(ax.angle, R);
+        svgContent += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#1c2740" stroke-width="1"/>`;
+        const [lx,ly] = pt(ax.angle, R+18);
+        svgContent += `<text x="${lx}" y="${ly}" fill="#7f93b3" font-size="9" font-family="Share Tech Mono" text-anchor="middle" dominant-baseline="middle">${ax.label}</text>`;
+      });
+      // data polygon
+      const dataPts = axes.map(ax=> pt(ax.angle, R*(ax.val/10)).join(',')).join(' ');
+      svgContent += `<polygon points="${dataPts}" fill="rgba(0,240,255,0.18)" stroke="#00f0ff" stroke-width="2"/>`;
+      axes.forEach(ax=>{
+        const [x,y] = pt(ax.angle, R*(ax.val/10));
+        svgContent += `<circle cx="${x}" cy="${y}" r="3.5" fill="#00f0ff"/>`;
+      });
+      svg.innerHTML = svgContent;
+    }
+  </script>
+</body>
+</html>

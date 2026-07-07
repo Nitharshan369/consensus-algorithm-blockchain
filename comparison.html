@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algorithm Comparison — Consensus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .comparison-table {
+      width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; font-family: 'Inter'; font-size: 0.9rem;
+      min-width: 1100px;
+    }
+    .comparison-table th, .comparison-table td {
+      border-bottom: 1px solid var(--line); padding: 16px 12px; text-align: left; vertical-align: middle;
+    }
+    .comparison-table th {
+      background: var(--cyan); color: #ffffff; font-family: 'Orbitron'; letter-spacing: 0.05em; font-size: 0.85rem;
+      position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--magenta); text-transform: uppercase;
+    }
+    .comparison-table tr:hover { background: rgba(0,240,255,0.03); }
+    .table-wrapper { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel2); }
+    
+    .algo-name { font-family: 'Orbitron'; font-weight: 700; color: var(--ink); font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+    .algo-code { font-family: 'Share Tech Mono'; font-size: 0.75rem; background: rgba(211,47,47,0.1); color: var(--cyan); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--cyan-dim); }
+    
+    .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; font-family: 'Share Tech Mono'; display: inline-block;}
+    .badge.yes { background: rgba(46,125,50,0.1); color: var(--green); border: 1px solid var(--green); }
+    .badge.no { background: rgba(0,0,0,0.05); color: var(--ink-faint); border: 1px solid var(--line); }
+    
+    .energy-high { color: var(--red); font-weight: 600; }
+    .energy-low { color: var(--green); font-weight: 600; }
+    .energy-med { color: var(--amber); font-weight: 600; }
+
+    .score-bar { width: 100px; height: 6px; background: var(--line); border-radius: 4px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 8px;}
+    .score-fill { height: 100%; border-radius: 4px; }
+    .score-text { font-family: 'Share Tech Mono'; font-size: 0.8rem; display: inline-block; width: 45px; text-align: right; }
+  </style>
+</head>
+<body>
+  <div class="page-container reveal in">
+    <div class="page-header">
+      <div class="pill mono l2" style="display:inline-block; margin-bottom: 12px; border-color: var(--amber); color: var(--amber);">// GLOBAL VIEW</div>
+      <h1>Premium Feature Matrix</h1>
+      <p>A comprehensive side-by-side comparison of all 10 consensus algorithms focusing on architecture, speed, and security.</p>
+    </div>
+
+    <div class="panel" style="padding: 0; border: none; background: transparent;">
+      <div class="table-wrapper">
+        <table class="comparison-table" id="comparisonTable">
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Requires Mining?</th>
+              <th>Has Validators?</th>
+              <th>Voting Based?</th>
+              <th>Energy Impact</th>
+              <th>Throughput (Speed)</th>
+              <th>Security Level</th>
+              <th>Decentralization</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built as an educational explorer · consensus data is simplified for teaching purposes
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tbody = document.querySelector('#comparisonTable tbody');
+      ALGOS.forEach(a => {
+        const s = a.summary;
+        const tr = document.createElement('tr');
+        
+        // Format Mining/Validators/Voting as badges
+        const mBadge = s.mining.includes('No') ? `<span class="badge no">${s.mining}</span>` : `<span class="badge yes">${s.mining}</span>`;
+        const vBadge = s.validators.includes('No') ? `<span class="badge no">${s.validators}</span>` : `<span class="badge yes">${s.validators}</span>`;
+        const voBadge = s.voting.includes('No') ? `<span class="badge no">${s.voting}</span>` : `<span class="badge yes">${s.voting}</span>`;
+        
+        // Format Energy
+        let eClass = 'energy-med';
+        const eStr = a.performance ? a.performance.energy : 'N/A';
+        if(eStr.includes('High')) eClass = 'energy-high';
+        if(eStr.includes('Low')) eClass = 'energy-low';
+
+        // Format Speed (using the Trilemma Scalability score 1-10)
+        const spdScore = a.trilemma.scal;
+        const spdColor = spdScore > 7 ? 'var(--cyan)' : (spdScore > 4 ? 'var(--amber)' : 'var(--red)');
+        const spdBar = `
+          <div><span class="score-text" style="color:${spdColor}">${s.speed}</span> 
+          <div class="score-bar"><div class="score-fill" style="width:${spdScore*10}%; background:${spdColor}"></div></div></div>
+        `;
+
+        // Format Security (using the Trilemma Security score 1-10)
+        const secScore = a.trilemma.sec;
+        const secColor = secScore > 7 ? 'var(--green)' : (secScore > 4 ? 'var(--amber)' : 'var(--red)');
+        const secBar = `
+          <div><span class="score-text" style="color:${secColor}">${s.security}</span> 
+          <div class="score-bar"><div class="score-fill" style="width:${secScore*10}%; background:${secColor}"></div></div></div>
+        `;
+
+        // Format Decentralization (using the Trilemma Dec score 1-10)
+        const decScore = a.trilemma.dec;
+        const decColor = decScore > 7 ? 'var(--magenta)' : (decScore > 4 ? 'var(--amber)' : 'var(--red)');
+        const decBar = `
+          <div><span class="score-text" style="color:${decColor}">${s.decentralization}</span> 
+          <div class="score-bar"><div class="score-fill" style="width:${decScore*10}%; background:${decColor}"></div></div></div>
+        `;
+
+        tr.innerHTML = `
+          <td>
+            <div class="algo-name">${a.name} <span class="algo-code">${a.code}</span></div>
+          </td>
+          <td>${mBadge}</td>
+          <td>${vBadge}</td>
+          <td>${voBadge}</td>
+          <td class="${eClass}">${eStr}</td>
+          <td>${spdBar}</td>
+          <td>${secBar}</td>
+          <td>${decBar}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+  </script>
+</body>
+</html>
