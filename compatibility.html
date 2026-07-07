@@ -83,18 +83,33 @@
       
       MATRIX_CHAINS.forEach((row, i) => {
         html += `<tr><th class="rowhead">${row.name}</th>`;
+        const algoObj = ALGOS.find(a => a.id === row.algo);
+
         MATRIX_CHAINS.forEach((col, j) => {
           let cls = '';
           let icon = '';
+          
           if (i === j) {
             cls = 'self';
             icon = '🟩';
-          } else if (row.algo === col.algo) {
-            cls = 'compat';
-            icon = '🟩';
           } else {
-            cls = 'incompat';
-            icon = '🟥';
+            // Check explicit compatibility data from data.js
+            let isCompat = false;
+            if (algoObj && algoObj.compatibility) {
+              const match = algoObj.compatibility.find(c => c.name.includes(col.name) || col.name.includes(c.name));
+              if (match && match.compatible) isCompat = true;
+            } else {
+              // Fallback to family check
+              if (row.algo === col.algo) isCompat = true;
+            }
+
+            if (isCompat) {
+              cls = 'compat';
+              icon = '🟩';
+            } else {
+              cls = 'incompat';
+              icon = '🟥';
+            }
           }
           html += `<td class="${cls}" data-row="${row.algo}" data-col="${col.algo}">${icon}</td>`;
         });

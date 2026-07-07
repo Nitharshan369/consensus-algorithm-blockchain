@@ -478,7 +478,7 @@ const ALGOS = [
   ],
   trilemmaSummary: 'PoB provides <b>good scalability and security</b> while reducing energy consumption. However, wealthier participants can gain an advantage by burning larger amounts of cryptocurrency.',
 
-  performance: { tps: "Moderate", blockTime: "Varies", finality: "Probabilistic", energy: "Very Low", latency: "Medium" },
+  performance: { tps: "Moderate", blockTime: "Varies", finality: "Probabilistic", energy: "Very low energy consumption", latency: "Medium" },
   pros: ["Very low energy consumption compared to PoW", "No expensive mining hardware is required", "Demonstrates long-term commitment", "Makes attacks costly (burned coins cannot be recovered)", "Reduces circulating supply"],
   cons: ["Burned coins are permanently lost", "Wealthier users can burn more coins and gain greater influence", "Limited adoption compared to PoW and PoS", "Reduces available coin supply"],
   chains:[
@@ -542,7 +542,7 @@ const ALGOS = [
   ],
   trilemmaSummary: 'PoET provides <b>fast, energy-efficient consensus</b> without mining, but its reliance on trusted hardware and permissioned environments limits decentralization.',
 
-  performance: { tps: "Moderate", blockTime: "Variable", finality: "Fast", energy: "Very Low", latency: "Medium" },
+  performance: { tps: "Moderate", blockTime: "Variable", finality: "Fast", energy: "Very low energy consumption", latency: "Medium" },
   pros: ["Very low energy consumption", "No expensive mining hardware required", "Fair validator selection using random waiting times", "Fast transaction confirmation", "Well suited for enterprise and permissioned blockchain networks"],
   cons: ["Depends on trusted hardware (Intel SGX)", "Primarily designed for permissioned blockchains", "Lower decentralization due to hardware requirements", "Limited adoption compared to PoW and PoS", "Trust in hardware manufacturers is required"],
   chains:[
@@ -571,7 +571,7 @@ const ALGOS = [
     {name:'Chia Network', consensus:'PoSp + Proof of Time', compatible:false}
   ],
 
-  summary: { mining: "No", validators: "Nodes with TEE", voting: "No", speed: "High", security: "Moderate", decentralization: "Low" },
+  summary: { mining: "No", validators: "Validators with TEE", voting: "No", speed: "High", security: "Moderate", decentralization: "Low" },
   
   mappingAdditionalInfo: [
     { title: "TEE (Trusted Execution Environment)", text: "A <b>Trusted Execution Environment (TEE)</b> is a <b>secure area inside a processor (CPU)</b> that runs sensitive code and stores confidential data in isolation from the rest of the system. Even if the operating system is compromised, the code running inside the TEE remains protected.<br><br><b>Example:</b> In <b>Proof of Elapsed Time (PoET)</b>, the TEE securely generates a random waiting time for each validator, ensuring that no validator can cheat." },
@@ -604,7 +604,7 @@ const ALGOS = [
   ],
   trilemmaSummary: 'PoI balances <b>security, scalability, and decentralization</b> by rewarding users who both <b>hold coins</b> and <b>actively participate</b> in the blockchain network.',
 
-  performance: { tps: "Moderate", blockTime: "Varies", finality: "Probabilistic", energy: "Very Low", latency: "Medium" },
+  performance: { tps: "Moderate", blockTime: "Varies", finality: "Probabilistic", energy: "Very low energy consumption", latency: "Medium" },
   pros: ["Very low energy consumption", "Encourages active participation in the network", "Reduces the advantage of simply holding large amounts of cryptocurrency", "Faster block creation than PoW", "Promotes a healthier and more active blockchain ecosystem"],
   cons: ["More complex than Proof of Stake", "Importance score calculation is harder to understand", "Mainly limited to the NEM ecosystem", "Large coin holders can still have an advantage", "Less widely adopted than PoW and PoS"],
   chains:[

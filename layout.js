@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Check theme preference
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+  }
+
   // Inject Header
   const headerHTML = `
     <header>
@@ -6,12 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="mark"><span>CX</span></div>
         <div class="brand-text">CONSENSUS<b>//</b>EXPLORER</div>
       </div>
-      <nav class="tabs">
-        <a href="index.html" id="nav-index">Overview</a>
-        <a href="algorithm.html" id="nav-algo">Algorithms</a>
-        <a href="compatibility.html" id="nav-matrix">Compatibility</a>
-        <a href="comparison.html" id="nav-compare">Comparison</a>
-      </nav>
+      <div style="display:flex; align-items:center; gap: 15px;">
+        <nav class="tabs">
+          <a href="index.html" id="nav-index">Overview</a>
+          <a href="algorithm.html" id="nav-algo">Algorithms</a>
+          <a href="compatibility.html" id="nav-matrix">Compatibility</a>
+          <a href="comparison.html" id="nav-compare">Comparison</a>
+        </nav>
+        <button id="themeToggleBtn" onclick="toggleTheme()" style="background:transparent; border:1px solid var(--line); color:var(--ink); padding:6px 12px; border-radius:4px; cursor:pointer; font-family:'Share Tech Mono'; font-size:12px; transition: all 0.2s;">
+          🌓 Theme
+        </button>
+      </div>
     </header>
   `;
   document.body.insertAdjacentHTML('afterbegin', headerHTML);
@@ -50,6 +61,15 @@ document.addEventListener('DOMContentLoaded', () => {
     rail.innerHTML = sidebarHTML;
   }
 });
+
+function toggleTheme() {
+  document.body.classList.toggle('dark-theme');
+  if (document.body.classList.contains('dark-theme')) {
+    localStorage.setItem('theme', 'dark');
+  } else {
+    localStorage.setItem('theme', 'light');
+  }
+}
 
 function changeAlgorithm(algoId) {
   const currentPath = window.location.pathname.split('/').pop() || 'algorithm.html';

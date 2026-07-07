@@ -7,6 +7,7 @@
   --ink-dim: #555555;
   --ink-faint: #999999;
   --line: #e0e0e0;
+  --header-bg: rgba(255, 255, 255, 0.95);
   
   --cyan: #d32f2f;
   --cyan-dim: #e57373;
@@ -15,6 +16,21 @@
   --green: #10ff61;
   --amber: #f57c00;
   --red: #ff2a2a;
+}
+body.dark-theme {
+  --bg: #121212;
+  --bg2: #1e1e1e;
+  --panel: #1a1a1a;
+  --panel2: #222222;
+  --ink: #ffffff;
+  --ink-dim: #cccccc;
+  --ink-faint: #888888;
+  --line: #333333;
+  --header-bg: rgba(18, 18, 18, 0.95);
+  
+  --cyan: #ff4d4d;
+  --cyan-dim: #ff7979;
+  --magenta: #ff6b81;
 }
 *{box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -53,7 +69,7 @@ a:hover {color: #000;}
 /* ---------- top nav ---------- */
 header{
   position:sticky;top:0;z-index:100;
-  background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);
+  background:var(--header-bg);backdrop-filter:blur(8px);
   border-bottom:1px solid var(--line);
   padding:16px 30px;display:flex;justify-content:space-between;align-items:center;
 }

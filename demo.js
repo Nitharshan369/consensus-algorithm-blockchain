@@ -27,6 +27,27 @@ function initDemo(algo) {
 // ==========================================
 // 1. PoW Demo
 // ==========================================
+
+function checkChainValidity(blocks) {
+  blocks.forEach(blk => {
+    if (blk.signed) {
+      if (blk.hashEl.value === blk.validHash) {
+        blk.blockEl.classList.remove('invalid');
+        blk.blockEl.style.borderColor = 'var(--green)';
+        blk.btn.textContent = blk.validBtnText;
+        blk.btn.style.background = 'var(--green)';
+        blk.btn.style.color = 'var(--ink)';
+      } else {
+        blk.blockEl.classList.add('invalid');
+        blk.blockEl.style.borderColor = 'var(--red)';
+        blk.btn.textContent = '❌ Chain Broken';
+        blk.btn.style.background = 'transparent';
+        blk.btn.style.color = 'var(--red)';
+      }
+    }
+  });
+}
+
 function initPowDemo(container, desc) {
   desc.textContent = "Proof of Work: Try changing the data. The block becomes invalid (red) because the hash changes. Click 'Mine' to find a new nonce that produces a valid hash (starts with '000'). Each block's hash depends on the previous block's hash!";
   
@@ -323,6 +344,7 @@ function initPosDemo(container, desc) {
       b.btn.style.background = 'var(--green)';
       b.btn.style.color = 'var(--ink)';
 
+      b.validHash = b.hashEl.value; b.validBtnText = b.btn.textContent;
       // Enable next block
       if(i+1 < blocks.length) {
         blocks[i+1].blockEl.style.opacity = '1';
@@ -341,6 +363,7 @@ function initPosDemo(container, desc) {
             await calculateHash(blocks[j]);
           }
         }
+        checkChainValidity(blocks);
       }
     });
   });
@@ -530,6 +553,7 @@ function initDposDemo(container, desc) {
       b.btn.style.background = 'var(--green)';
       b.btn.style.color = 'var(--ink)';
 
+      b.validHash = b.hashEl.value; b.validBtnText = b.btn.textContent;
       // Enable next block
       if(i+1 < blocks.length) {
         blocks[i+1].blockEl.style.opacity = '1';
@@ -549,6 +573,7 @@ function initDposDemo(container, desc) {
             await calculateHash(blocks[j]);
           }
         }
+        checkChainValidity(blocks);
       }
     });
   });
@@ -700,6 +725,7 @@ function initPoaDemo(container, desc) {
       b.btn.style.background = 'var(--green)';
       b.btn.style.color = 'var(--ink)';
 
+      b.validHash = b.hashEl.value; b.validBtnText = b.btn.textContent;
       // Enable next block
       if(i+1 < blocks.length) {
         blocks[i+1].blockEl.style.opacity = '1';
@@ -719,6 +745,7 @@ function initPoaDemo(container, desc) {
             await calculateHash(blocks[j]);
           }
         }
+        checkChainValidity(blocks);
       }
     });
   });
@@ -878,6 +905,7 @@ function initPohDemo(container, desc) {
       b.btn.style.color = 'var(--ink)';
       b.btn.style.borderColor = 'var(--green)';
 
+      b.validHash = b.hashEl.value; b.validBtnText = b.btn.textContent;
       // Enable next block
       if(i+1 < blocks.length) {
         blocks[i+1].blockEl.style.opacity = '1';
@@ -897,6 +925,7 @@ function initPohDemo(container, desc) {
             await calculateHash(blocks[j]);
           }
         }
+        checkChainValidity(blocks);
       }
     });
   });
@@ -1034,7 +1063,8 @@ function initPbftDemo(container, desc) {
             b.btn.style.color = 'var(--ink)';
             b.btn.style.borderColor = 'var(--green)';
 
-            // Enable next block
+            b.validHash = b.hashEl.value; b.validBtnText = b.btn.textContent;
+      // Enable next block
             if(i+1 < blocks.length) {
               blocks[i+1].blockEl.style.opacity = '1';
               blocks[i+1].blockEl.style.pointerEvents = 'auto';
@@ -1056,6 +1086,7 @@ function initPbftDemo(container, desc) {
             await calculateHash(blocks[j]);
           }
         }
+        checkChainValidity(blocks);
       }
     });
   });
@@ -1246,7 +1277,8 @@ function initPoSpaceDemo(container, desc) {
         b.btn.style.color = 'var(--ink)';
         b.btn.style.borderColor = isMe ? 'var(--green)' : 'var(--amber)';
 
-        // Enable next block
+        b.validHash = b.hashEl.value; b.validBtnText = b.btn.textContent;
+      // Enable next block
         if(i+1 < blocks.length) {
           blocks[i+1].blockEl.style.opacity = '1';
           blocks[i+1].blockEl.style.pointerEvents = 'auto';
@@ -1266,6 +1298,7 @@ function initPoSpaceDemo(container, desc) {
             await calculateHash(blocks[j]);
           }
         }
+        checkChainValidity(blocks);
       }
     });
   });
@@ -1464,7 +1497,8 @@ function initPobDemo(container, desc) {
         b.btn.style.color = isMe ? "var(--green)" : "var(--amber)";
         b.blockEl.style.borderColor = isMe ? "var(--green)" : "var(--amber)";
         
-        // Enable next block
+        b.validHash = b.hashEl.value; b.validBtnText = b.btn.textContent;
+      // Enable next block
         if(i+1 < blocks.length) {
           blocks[i+1].blockEl.style.opacity = '1';
           blocks[i+1].blockEl.style.pointerEvents = 'auto';
@@ -1703,7 +1737,8 @@ function initPoetDemo(container, desc) {
           tAInput.style.color = "var(--ink)";
           tBInput.style.color = "var(--ink)";
 
-          // Enable next block
+          b.validHash = b.hashEl.value; b.validBtnText = b.btn.textContent;
+      // Enable next block
           if(i+1 < blocks.length) {
             blocks[i+1].blockEl.style.opacity = '1';
             blocks[i+1].blockEl.style.pointerEvents = 'auto';
@@ -1936,7 +1971,8 @@ function initPoiDemo(container, desc) {
         b.blockEl.style.borderColor = isMe ? "var(--green)" : "var(--amber)";
         b.blockEl.classList.remove('invalid');
         
-        // Enable next block
+        b.validHash = b.hashEl.value; b.validBtnText = b.btn.textContent;
+      // Enable next block
         if(i+1 < blocks.length) {
           blocks[i+1].blockEl.style.opacity = '1';
           blocks[i+1].blockEl.style.pointerEvents = 'auto';
