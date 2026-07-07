@@ -756,30 +756,88 @@ function animPoet(t) {
   drawDynamicChain();
 }
 
-function animPoi(t){
-  const cx=W/2, cy=65;
-  if(!vizState.scores) vizState.scores=[34,89,12,56];
-  if(vizState.winner===undefined){ vizState.winner=-1; vizState.timer=0; }
-  ctx.clearRect(0,0,W,H);
-  for(let i=0;i<4;i++){
-    const x = cx - 120 + i*80;
-    const active = i===vizState.winner;
-    drawNode(x, cy, 22, 'N'+(i+1), active);
-    ctx.fillStyle = active ? COLORS.green : '#888';
-    ctx.font='9px "Share Tech Mono"'; ctx.textAlign='center';
-    ctx.fillText('Imp:'+vizState.scores[i], x, cy+36);
-    if(active) ctx.fillText('Harvesting', x, cy-34);
+function animPoi(t) {
+  const cx = W / 2, cy = 80;
+  
+  if (!vizState.nodes) {
+    vizState.nodes = [
+      { id: 'N1', stake: 100, activity: 5, score: 35 },
+      { id: 'N2', stake: 50, activity: 40, score: 75 },
+      { id: 'N3', stake: 200, activity: 2, score: 25 },
+      { id: 'N4', stake: 80, activity: 25, score: 65 }
+    ];
   }
-  ctx.font='10px "Share Tech Mono"'; ctx.fillStyle=COLORS.ink; ctx.textAlign='center';
-  ctx.fillText('Network activity + stake = Importance Score for harvesting', cx, cy+65);
+  
+  if (vizState.winner === undefined) { 
+    vizState.winner = -1; 
+    vizState.timer = 0; 
+  }
+  
+  ctx.clearRect(0, 0, W, H);
+  
+  const totalScore = vizState.nodes.reduce((sum, n) => sum + n.score, 0);
+
+  // Draw network connections to simulate "activity"
+  ctx.strokeStyle = 'rgba(211,47,47,0.1)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 4; i++) {
+    for (let j = i + 1; j < 4; j++) {
+      if (Math.sin(t / 10 + i + j) > 0.5) { // Random flashing links
+        ctx.beginPath();
+        ctx.moveTo(cx - 150 + i * 100, cy);
+        ctx.lineTo(cx - 150 + j * 100, cy);
+        ctx.stroke();
+      }
+    }
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const x = cx - 150 + i * 100;
+    const active = i === vizState.winner;
+    const n = vizState.nodes[i];
+    
+    // Draw Harvester Node
+    drawNode(x, cy, 22, n.id, active);
+    
+    ctx.fillStyle = active ? COLORS.green : COLORS.ink;
+    ctx.font = '10px "Share Tech Mono"';
+    ctx.textAlign = 'center';
+    
+    // Show stats
+    ctx.fillText(`Stake: ${n.stake}`, x, cy + 35);
+    ctx.fillText(`Activity: ${n.activity}`, x, cy + 47);
+    
+    ctx.fillStyle = active ? COLORS.green : COLORS.magenta;
+    ctx.font = '11px "Share Tech Mono"';
+    ctx.fillText(`PoI Score: ${n.score}`, x, cy + 62);
+    
+    if (active) {
+      ctx.fillText('HARVESTING!', x, cy - 35);
+    }
+  }
+  
+  ctx.font = '11px "Share Tech Mono"'; 
+  ctx.fillStyle = COLORS.ink; 
+  ctx.textAlign = 'center';
+  ctx.fillText('Vested Stake + Network Activity = Importance Score for Harvesting Blocks', cx, cy + 85);
   
   vizState.timer++;
-  if(vizState.timer>90){
-    vizState.timer=0;
-    let r = Math.random()*191, acc=0; // 191 is sum
-    for(let i=0;i<4;i++){ acc+=vizState.scores[i]; if(r<=acc){ vizState.winner=i; break; } }
+  if (vizState.timer > 100) {
+    vizState.timer = 0;
+    
+    // Pick winner weighted by PoI Score
+    let r = Math.random() * totalScore;
+    let acc = 0;
+    for (let i = 0; i < 4; i++) { 
+      acc += vizState.nodes[i].score; 
+      if (r <= acc) { 
+        vizState.winner = i; 
+        break; 
+      } 
+    }
     pushBlock(COLORS.green);
   }
+  
   drawDynamicChain();
 }
 

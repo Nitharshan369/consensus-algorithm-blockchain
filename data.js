@@ -581,25 +581,65 @@ const ALGOS = [
 },
 {
   id:'poi', code:'PoI', name:'Proof of Importance',
-  mechanism:"Rather than rewarding pure wealth (like naive PoS) or pure hashpower, each account gets an 'importance score' from multiple signals: vested balance, transaction volume, and how connected it is to other active accounts. Higher importance means a higher chance of harvesting the next block.",
+  mechanism:"Proof of Importance (PoI) is a consensus algorithm that selects the next block creator based on a participant's importance score rather than only the number of coins they own. The importance score is calculated using factors such as the amount of coins held (vested stake), transaction activity, and participation in the network. This encourages users to actively use the blockchain, rather than simply holding coins. Note: PoI was introduced by the NEM blockchain to improve upon traditional Proof of Stake (PoS).",
+  explain:"Imagine three students competing for the title of 'Best Student.' The teacher does not choose the winner based only on exam marks. Instead, the teacher also considers: Attendance, Class participation, Homework completion. Example: Student A → High marks, little participation. Student B → Good marks, active participation. Student C → Average marks, very active. Student B has the highest overall score and wins. Similarly, PoI considers coin ownership and network activity to determine who creates the next block.",
   steps:[
-    "The network analyses each account's vested balance, recent transaction activity, and network graph position.",
-    "These signals combine into a single importance score per account.",
-    "Accounts with higher importance are more likely to be selected to 'harvest' a block.",
-    "The selected account bundles pending transactions and produces the block.",
-    "Rewards flow back, reinforcing genuinely active, well-connected participants rather than pure hoarders."
+    "Participants hold the blockchain's native cryptocurrency.",
+    "Coins must remain in the wallet for a certain period to become vested, showing long-term commitment.",
+    "The network calculates an importance score based on: Number of vested coins, Transaction activity, Participation in the network.",
+    "Participants with higher importance scores have a greater chance of being selected to create the next block.",
+    "The selected validator collects pending transactions and creates a new block.",
+    "The remaining nodes verify the importance score, transaction validity, digital signatures, and no double spending.",
+    "Once verified, the block is added to the blockchain, and consensus is reached.",
+    "The validator receives transaction fees and block rewards (depending on the blockchain's reward model)."
   ],
-  layer:'L1', vizTag:'IMPORTANCE SCORING',
-  vizCaption:'Balance, activity and network connectivity blend into a score that decides who harvests next.',
-  trilemma:{scal:7, sec:6, dec:6, blockTime:'~1 min (NEM)', tps:'Moderate', attack:'Sybil clusters gaming the importance graph'},
-  explain:"Encourages genuine network usage over simple coin-hoarding, though the scoring formula itself becomes a new thing attackers try to game.",
-  performance: { tps: "Moderate", blockTime: "~1 minute", finality: "Probabilistic", energy: "Low", latency: "Medium" },
-  pros: ["Encourages active network use", "Doesn't just reward the richest users", "Energy efficient"],
-  cons: ["Complex scoring algorithm", "Susceptible to Sybil cluster gaming", "Niche adoption"],
+  layer:'L1', vizTag:'IMPORTANCE HARVESTING',
+  vizCaption:'Nodes with higher Importance Scores (calculated from stake + activity) are selected to "harvest" (create) blocks.',
+  trilemma:{scal:8, sec:8, dec:8, blockTime:'Varies by chain', tps:'Moderate', attack:'Sybil / coordinated accounts attack'},
+  
+  trilemmaTable: [
+    {prop: '🚀 Scalability', rating: '★★★★☆ (4/5)', exp: 'No mining is required, enabling efficient and fast transaction processing.'},
+    {prop: '🔒 Security', rating: '★★★★☆ (4/5)', exp: 'Security comes from combining vested stake with network activity, making attacks more difficult.'},
+    {prop: '🌐 Decentralization', rating: '★★★★☆ (4/5)', exp: 'Encourages active participation instead of rewarding only the wealthiest coin holders.'}
+  ],
+  trilemmaSummary: 'PoI balances <b>security, scalability, and decentralization</b> by rewarding users who both <b>hold coins</b> and <b>actively participate</b> in the blockchain network.',
+
+  performance: { tps: "Moderate", blockTime: "Varies", finality: "Probabilistic", energy: "Very Low", latency: "Medium" },
+  pros: ["Very low energy consumption", "Encourages active participation in the network", "Reduces the advantage of simply holding large amounts of cryptocurrency", "Faster block creation than PoW", "Promotes a healthier and more active blockchain ecosystem"],
+  cons: ["More complex than Proof of Stake", "Importance score calculation is harder to understand", "Mainly limited to the NEM ecosystem", "Large coin holders can still have an advantage", "Less widely adopted than PoW and PoS"],
   chains:[
-    {name:'NEM (XEM)', why:'Designed PoI specifically to reward active participants and discourage passive whales from dominating block production.', lang:'Smart Assets API (Java/JS)'}
+    {name:'NEM (XEM)', why:'Uses Proof of Importance to reward users based on vested stake and network activity instead of only coin ownership.', lang:'Smart Asset System (No traditional smart contracts)'}
   ],
-  summary: { mining: "No", validators: "Harvesters", voting: "No", speed: "Moderate", security: "Moderate", decentralization: "Moderate" }
+  
+  smartContracts: [
+    {chain: 'NEM', lang: 'Smart Asset System (No traditional smart contracts)', rel: 'PoI selects the block creator, while NEM provides Smart Assets for blockchain applications.'}
+  ],
+  smartContractNote: "<b>Note:</b> PoI determines <b>who creates the next block</b>, while blockchain application logic is implemented through NEM's Smart Asset features rather than traditional smart contracts.",
+
+  layerClassification: {
+    layer: 'Layer 1',
+    description: 'NEM is a Layer 1 blockchain. A Layer 1 blockchain is responsible for validating transactions, maintaining the blockchain ledger, reaching consensus, and managing digital assets.',
+    examples: ['NEM'],
+    whyNotLayer2: 'PoI enables Layer 1 consensus by selecting validators based on their importance score.'
+  },
+  
+  compatibility: [
+    {name:'NEM', consensus:'PoI', compatible:true},
+    {name:'Bitcoin', consensus:'PoW', compatible:false},
+    {name:'Ethereum', consensus:'PoS', compatible:false},
+    {name:'Cardano', consensus:'PoS', compatible:false},
+    {name:'Solana', consensus:'PoH + PoS', compatible:false},
+    {name:'Hyperledger Fabric', consensus:'PBFT', compatible:false},
+    {name:'Chia Network', consensus:'PoSp', compatible:false}
+  ],
+
+  summary: { mining: "No", validators: "Harvesters", voting: "No", speed: "High", security: "High", decentralization: "High" },
+  
+  mappingAdditionalInfo: [
+    { title: "NEM", text: "<b>NEM (New Economy Movement)</b> is a <b>Layer 1 blockchain platform</b> that uses the <b>Proof of Importance (PoI)</b> consensus algorithm. It is designed to provide fast, secure, and energy-efficient transactions while rewarding users who actively participate in the network." },
+    { title: "Vested Stake", text: "<b>Vested stake</b> refers to cryptocurrency that has been <b>held in a wallet for a certain period of time</b>. Only these vested coins are considered when calculating a user's <b>importance score</b> in Proof of Importance (PoI).<br><br><b>Example:</b><br>• Alice owns <b>10,000 XEM</b>.<br>• She keeps the coins in her wallet for several days.<br>• Over time, the coins become <b>vested</b>.<br>• These vested coins increase her importance score, giving her a better chance of creating the next block.<br><br><b>In simple terms:</b> <b>Vested stake</b> means <b>long-term held coins</b> that demonstrate commitment to the blockchain network." }
+  ],
+  takeaway: "<b>Proof of Importance (PoI)</b> is a consensus algorithm that selects the next block creator based on an <b>importance score</b>, which considers <b>vested coin holdings, transaction activity, and overall participation</b> in the network. By rewarding users who actively contribute to the blockchain instead of only those with the most coins, PoI provides <b>energy-efficient, secure, and balanced consensus</b>, making it a unique alternative to traditional Proof of Stake systems."
 }
 ];
 

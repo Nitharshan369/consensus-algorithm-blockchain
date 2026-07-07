@@ -1738,29 +1738,235 @@ function initPoetDemo(container, desc) {
   updateBlockHash(blocks[0]);
 }
 
-// ==========================================
-// 10. PoI Demo
-// ==========================================
 function initPoiDemo(container, desc) {
-  desc.textContent = "Proof of Importance: Adjust your network activity. More balance and more transactions increase your importance score.";
+  desc.innerHTML = "Proof of Importance: Adjust your Vested Stake and Network Activity. Higher balances and activity increase your <b>Importance Score</b>, giving you a better chance to harvest the block.";
+  
+  let state = {
+    myStake: 10000,
+    myActivity: 50,
+    myScore: 0,
+    rivalScore: 0
+  };
+
   container.innerHTML = `
-    <div class="demo-block">
-      <div class="demo-row"><span class="demo-label" style="width:100px">Vested Balance</span><input type="range" id="poiBal" min="1" max="100" value="10" style="flex-grow:1"></div>
-      <div class="demo-row"><span class="demo-label" style="width:100px">Recent Txs</span><input type="range" id="poiTx" min="1" max="100" value="5" style="flex-grow:1"></div>
-      <hr style="border-color:var(--line); margin: 20px 0;">
-      <div style="text-align:center;">
-        <span style="color:var(--ink-dim)">Your Importance Score</span><br>
-        <strong id="poiScore" style="font-size:3rem; color:var(--green); font-family:'Orbitron'">0.015</strong>
+    <div style="display:flex; justify-content:flex-end; margin-bottom: 15px;">
+      <button class="demo-btn" id="poiResetBtn" style="padding: 6px 12px; font-size: 0.85rem;">↺ Reset Demo</button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      
+      <!-- PoI Network Panel -->
+      <div class="demo-block" style="background:rgba(0,0,0,0.02); border-color:var(--cyan);" id="poiNetworkPanel">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom:10px;">
+          <h4 style="margin-top:0; color:var(--cyan); font-family:'Orbitron';">NEM Network (Importance Scoring)</h4>
+        </div>
+        
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <!-- User Controls -->
+          <div style="flex:1; min-width:200px; padding-right:20px; border-right:1px solid var(--line);">
+            <div style="color:var(--magenta); font-weight:bold; margin-bottom:10px;">Your Harvester Node</div>
+            
+            <div style="margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--ink-faint);">
+                <span>Vested Stake (XEM)</span>
+                <span id="poiStakeVal" style="color:var(--ink); font-weight:bold;">10000</span>
+              </div>
+              <input type="range" id="poiStakeSlider" min="1000" max="50000" step="1000" value="10000" style="width:100%;">
+            </div>
+            
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--ink-faint);">
+                <span>Network Activity</span>
+                <span id="poiActVal" style="color:var(--ink); font-weight:bold;">50</span>
+              </div>
+              <input type="range" id="poiActSlider" min="0" max="100" value="50" style="width:100%;">
+            </div>
+          </div>
+          
+          <!-- Scores -->
+          <div style="flex:1; min-width:200px; display:flex; flex-direction:column; justify-content:center;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
+              <div>
+                <div style="color:var(--ink-faint); font-size:0.8rem;">Your Importance Score</div>
+                <div id="poiMyScoreDisplay" style="font-family:'Share Tech Mono'; font-size:1.8rem; color:var(--magenta);">0.000</div>
+              </div>
+              <div style="font-size:1.2rem; color:var(--ink-dim);">VS</div>
+              <div style="text-align:right;">
+                <div style="color:var(--ink-faint); font-size:0.8rem; margin-bottom:5px;">Average Rival Score</div>
+                <input type="number" id="poiRivalInput" class="demo-input" style="font-family:'Share Tech Mono'; font-size:1.5rem; color:var(--ink); width:110px; text-align:center; padding: 2px;" value="1.250" step="0.1" min="0.1">
+              </div>
+            </div>
+            <div style="font-size:0.8rem; color:var(--ink-dim); text-align:center;">
+              Win Probability: <strong id="poiProbDisplay" style="color:var(--green);">0%</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 1 -->
+      <div class="demo-block" id="poiBlock1">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom: 16px;">
+          <h4 style="margin:0; color:var(--cyan); font-family:'Orbitron';">Block #1</h4>
+        </div>
+        <div class="demo-row" style="align-items:flex-start;"><span class="demo-label">Data</span><textarea class="demo-textarea" id="poiData1">TX: System -> Alice 10 Tokens</textarea></div>
+        <div class="demo-row"><span class="demo-label">Harvester</span><input type="text" class="demo-input" id="poiProd1" disabled placeholder="Waiting to harvest..."></div>
+        <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="poiPrev1" value="00000000000000000000000000000000" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
+        <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="poiHash1" disabled style="font-size:0.75rem;"></div>
+        <button class="demo-btn" id="poiBtn1" style="margin-top:15px; border-color:var(--cyan); color:var(--cyan);">🌾 Attempt to Harvest Block</button>
+      </div>
+
+      <!-- Block 2 -->
+      <div class="demo-block invalid" id="poiBlock2" style="opacity:0.5; pointer-events:none;">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom: 16px;">
+          <h4 style="margin:0; color:var(--cyan); font-family:'Orbitron';">Block #2</h4>
+        </div>
+        <div class="demo-row" style="align-items:flex-start;"><span class="demo-label">Data</span><textarea class="demo-textarea" id="poiData2">TX: Alice -> Bob 5 Tokens</textarea></div>
+        <div class="demo-row"><span class="demo-label">Harvester</span><input type="text" class="demo-input" id="poiProd2" disabled placeholder="Waiting to harvest..."></div>
+        <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="poiPrev2" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
+        <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="poiHash2" disabled style="font-size:0.75rem;"></div>
+        <button class="demo-btn" id="poiBtn2" style="margin-top:15px; border-color:var(--cyan); color:var(--cyan);" disabled>🌾 Attempt to Harvest Block</button>
+      </div>
+
+      <!-- Block 3 -->
+      <div class="demo-block invalid" id="poiBlock3" style="opacity:0.5; pointer-events:none;">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom: 16px;">
+          <h4 style="margin:0; color:var(--cyan); font-family:'Orbitron';">Block #3</h4>
+        </div>
+        <div class="demo-row" style="align-items:flex-start;"><span class="demo-label">Data</span><textarea class="demo-textarea" id="poiData3">TX: Bob -> Charlie 2 Tokens</textarea></div>
+        <div class="demo-row"><span class="demo-label">Harvester</span><input type="text" class="demo-input" id="poiProd3" disabled placeholder="Waiting to harvest..."></div>
+        <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="poiPrev3" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
+        <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="poiHash3" disabled style="font-size:0.75rem;"></div>
+        <button class="demo-btn" id="poiBtn3" style="margin-top:15px; border-color:var(--cyan); color:var(--cyan);" disabled>🌾 Attempt to Harvest Block</button>
       </div>
     </div>
   `;
-  const bal = document.getElementById('poiBal'), tx = document.getElementById('poiTx'), score = document.getElementById('poiScore');
-  const update = () => {
-    // arbitrary formula for demo
-    const s = ((parseInt(bal.value)*0.6) + (parseInt(tx.value)*1.4)) / 2000;
-    score.textContent = s.toFixed(4);
-  };
-  bal.addEventListener('input', update);
-  tx.addEventListener('input', update);
-  update();
+
+  const blocks = [
+    {
+      blockEl: document.getElementById('poiBlock1'),
+      dataEl: document.getElementById('poiData1'),
+      prodEl: document.getElementById('poiProd1'),
+      prevEl: document.getElementById('poiPrev1'),
+      hashEl: document.getElementById('poiHash1'),
+      btn: document.getElementById('poiBtn1'),
+      signed: false
+    },
+    {
+      blockEl: document.getElementById('poiBlock2'),
+      dataEl: document.getElementById('poiData2'),
+      prodEl: document.getElementById('poiProd2'),
+      prevEl: document.getElementById('poiPrev2'),
+      hashEl: document.getElementById('poiHash2'),
+      btn: document.getElementById('poiBtn2'),
+      signed: false
+    },
+    {
+      blockEl: document.getElementById('poiBlock3'),
+      dataEl: document.getElementById('poiData3'),
+      prodEl: document.getElementById('poiProd3'),
+      prevEl: document.getElementById('poiPrev3'),
+      hashEl: document.getElementById('poiHash3'),
+      btn: document.getElementById('poiBtn3'),
+      signed: false
+    }
+  ];
+
+  const stakeSlider = document.getElementById('poiStakeSlider');
+  const actSlider = document.getElementById('poiActSlider');
+  const stakeVal = document.getElementById('poiStakeVal');
+  const actVal = document.getElementById('poiActVal');
+  const myScoreDisplay = document.getElementById('poiMyScoreDisplay');
+  const rivalInput = document.getElementById('poiRivalInput');
+  const probDisplay = document.getElementById('poiProbDisplay');
+  
+  function updateScores() {
+    state.myStake = parseInt(stakeSlider.value);
+    state.myActivity = parseInt(actSlider.value);
+    stakeVal.textContent = state.myStake.toLocaleString();
+    actVal.textContent = state.myActivity;
+    
+    // Formula to simulate PoI weighting (Stake + Activity multiplier)
+    state.myScore = ((state.myStake / 10000) * 0.6) + ((state.myActivity / 50) * 0.4);
+    
+    // Read rival network score from user input
+    state.rivalScore = parseFloat(rivalInput.value) || 0.1; 
+    
+    myScoreDisplay.textContent = state.myScore.toFixed(3);
+    
+    const totalScore = state.myScore + (state.rivalScore * 3); // Assume 3 average rivals
+    const prob = (state.myScore / totalScore) * 100;
+    probDisplay.textContent = prob.toFixed(1) + '%';
+  }
+
+  stakeSlider.addEventListener('input', updateScores);
+  actSlider.addEventListener('input', updateScores);
+  rivalInput.addEventListener('input', updateScores);
+  updateScores();
+
+  blocks.forEach((b, i) => {
+    b.btn.addEventListener('click', async () => {
+      b.btn.disabled = true;
+      b.btn.textContent = "Calculating Importance...";
+      b.btn.style.borderColor = "var(--line)";
+      b.btn.style.color = "var(--ink-faint)";
+      
+      // Simulate network evaluation
+      setTimeout(async () => {
+        const totalScore = state.myScore + (state.rivalScore * 3);
+        const r = Math.random() * totalScore;
+        
+        let winnerName = "Rival Network";
+        let isMe = false;
+        
+        if (r <= state.myScore) {
+          winnerName = "You";
+          isMe = true;
+        }
+
+        b.prodEl.value = winnerName;
+        b.prodEl.style.color = isMe ? "var(--green)" : "var(--amber)";
+        b.prodEl.style.fontWeight = "bold";
+
+        b.signed = true;
+        if(i > 0) b.prevEl.value = blocks[i-1].hashEl.value;
+        await updateBlockHash(b);
+        
+        b.btn.textContent = isMe ? "✅ You Harvested Block!" : "⚠️ Rival Harvested Block";
+        b.btn.style.borderColor = isMe ? "var(--green)" : "var(--amber)";
+        b.btn.style.color = isMe ? "var(--green)" : "var(--amber)";
+        b.blockEl.style.borderColor = isMe ? "var(--green)" : "var(--amber)";
+        b.blockEl.classList.remove('invalid');
+        
+        // Enable next block
+        if(i+1 < blocks.length) {
+          blocks[i+1].blockEl.style.opacity = '1';
+          blocks[i+1].blockEl.style.pointerEvents = 'auto';
+          blocks[i+1].prevEl.value = b.hashEl.value;
+          blocks[i+1].btn.disabled = false;
+          blocks[i+1].btn.textContent = "🌾 Attempt to Harvest Block";
+        }
+      }, 800);
+    });
+
+    b.dataEl.addEventListener('input', async () => {
+      if(b.signed) {
+        await updateBlockHash(b);
+        for(let j=i+1; j<blocks.length; j++) {
+          if(blocks[j].signed) {
+            blocks[j].prevEl.value = blocks[j-1].hashEl.value;
+            await updateBlockHash(blocks[j]);
+          }
+        }
+      }
+    });
+  });
+
+  document.getElementById('poiResetBtn').addEventListener('click', () => initPoiDemo(container, desc));
+  
+  async function updateBlockHash(b) {
+    const content = b.dataEl.value + b.prodEl.value + b.prevEl.value;
+    b.hashEl.value = await sha256(content);
+  }
+
+  // Initialize initial hash
+  updateBlockHash(blocks[0]);
 }
