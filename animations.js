@@ -683,38 +683,74 @@ function animPob(t){
 }
 
 
-function animPoet(t){
-  const cx=W/2, cy=60;
-  if(!vizState.timers) vizState.timers=[80,120,45,200];
-  if(vizState.winner===undefined){ vizState.winner=-1; vizState.timer=0; }
-  ctx.clearRect(0,0,W,H);
+function animPoet(t) {
+  const cx = W / 2, cy = 90;
+  if (!vizState.timers) vizState.timers = [80, 150, 45, 200];
+  if (vizState.winner === undefined) { 
+    vizState.winner = -1; 
+    vizState.timer = 0;
+    vizState.phase = 0; // 0: Waiting, 1: Winner announced
+  }
+  ctx.clearRect(0, 0, W, H);
+  
+  const pos = [
+    [cx - 150, cy],
+    [cx - 50, cy],
+    [cx + 50, cy],
+    [cx + 150, cy]
+  ];
+
   let justWon = -1;
-  for(let i=0;i<4;i++){
-    const x = cx - 120 + i*80;
-    const active = i===vizState.winner;
-    drawNode(x,cy,22,'TEE', active);
-    if(vizState.winner === -1) {
-      vizState.timers[i] = Math.max(0, vizState.timers[i]-1);
-      if(vizState.timers[i]===0) justWon = i;
+  for (let i = 0; i < 4; i++) {
+    const x = pos[i][0];
+    const y = pos[i][1];
+    const active = i === vizState.winner;
+    
+    // Draw TEE Node
+    drawNode(x, y, 22, 'TEE', active);
+    
+    // Timer logic
+    if (vizState.phase === 0) {
+      vizState.timers[i] = Math.max(0, vizState.timers[i] - 0.5);
+      if (vizState.timers[i] === 0 && justWon === -1) {
+        justWon = i;
+      }
     }
-    ctx.fillStyle = active ? COLORS.green : '#888';
-    ctx.font='9px "Share Tech Mono"'; ctx.textAlign='center';
-    ctx.fillText('wait:'+(vizState.timers[i]|0), x, cy+36);
+
+    // Draw timer
+    ctx.fillStyle = active ? COLORS.green : COLORS.ink;
+    ctx.font = '10px "Share Tech Mono"';
+    ctx.textAlign = 'center';
+    
+    if (active) {
+      ctx.fillText('WINNER!', x, y - 35);
+      ctx.fillStyle = COLORS.green;
+      ctx.fillText('0.0s', x, y + 40);
+    } else {
+      ctx.fillText((vizState.timers[i] / 10).toFixed(1) + 's', x, y + 40);
+    }
   }
-  ctx.font='10px "Share Tech Mono"'; ctx.fillStyle=COLORS.ink; ctx.textAlign='center';
-  ctx.fillText('Trusted Execution Environments enforce fair random wait times', cx, cy+65);
+
+  // Draw SGX Info
+  ctx.font = '11px "Share Tech Mono"';
+  ctx.fillStyle = COLORS.ink;
+  ctx.textAlign = 'center';
+  ctx.fillText('Intel SGX securely enforces fair random wait times', cx, cy + 65);
   
-  if(justWon > -1) {
+  if (justWon > -1) {
     vizState.winner = justWon;
-    vizState.timer = 50;
-    pushBlock(COLORS.amber);
+    vizState.phase = 1;
+    vizState.timer = 60; // hold winner state for 60 frames
+    pushBlock(COLORS.cyan);
   }
   
-  if(vizState.winner>-1){
+  if (vizState.phase === 1) {
     vizState.timer--;
-    if(vizState.timer<=0){
-      vizState.winner=-1;
-      vizState.timers = vizState.timers.map(()=>40+Math.random()*150|0);
+    if (vizState.timer <= 0) {
+      vizState.phase = 0;
+      vizState.winner = -1;
+      // Assign new random timers (between 3s and 12s)
+      vizState.timers = vizState.timers.map(() => 30 + Math.random() * 90 | 0);
     }
   }
   drawDynamicChain();

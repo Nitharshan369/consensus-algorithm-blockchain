@@ -519,25 +519,65 @@ const ALGOS = [
 },
 {
   id:'poet', code:'PoET', name:'Proof of Elapsed Time',
-  mechanism:"Each participating node requests a random wait time from a trusted hardware enclave (like Intel SGX). Whoever's timer expires first gets to produce the block — like a fair, hardware-verified lottery where cheating the wait time is designed to be practically impossible.",
+  mechanism:"Proof of Elapsed Time (PoET) is a consensus algorithm that selects the next block creator by assigning each validator a random waiting time. The validator with the shortest waiting time wins the right to create the next block. To ensure fairness, PoET relies on Trusted Execution Environments (TEE) such as Intel Software Guard Extensions (SGX), which securely generate and verify the random waiting times. Note: PoET is mainly used in permissioned (private) blockchain networks.",
+  explain: "Imagine five students drawing random numbers to decide who presents first. Student A → Wait 8 minutes, Student B → Wait 2 minutes, Student C → Wait 5 minutes. Since Student B has the shortest waiting time, they present first. Similarly, in PoET, every validator receives a random wait time, and the validator with the shortest wait creates the next block.",
   steps:[
-    "Each node asks a trusted execution environment (TEE) for a random wait duration.",
-    "Nodes go idle for their assigned duration — no computation is wasted.",
-    "The first node whose timer naturally expires broadcasts its block.",
-    "The TEE provides a certificate proving the wait wasn't manipulated.",
-    "Other nodes verify the certificate and accept the block if it's genuine."
+    "Users create transactions (e.g. Alice -> Bob).",
+    "Each validator receives a random waiting time generated securely by the Trusted Execution Environment (TEE).",
+    "Each validator waits until its assigned timer expires.",
+    "The validator whose waiting time finishes first earns the right to create the next block.",
+    "The winning validator collects the pending transactions and creates a new block.",
+    "Other validators verify the waiting-time certificate, transaction validity, digital signatures, and no double spending.",
+    "Once verified, the block is added to the blockchain, and consensus is reached.",
+    "The winning validator receives the block reward and transaction fees."
   ],
   layer:'L1', vizTag:'RANDOM WAIT RACE',
-  vizCaption:'Each node gets a hardware-issued random countdown — first to reach zero honestly wins.',
-  trilemma:{scal:7, sec:6, dec:5, blockTime:'Variable (seconds)', tps:'Moderate', attack:'Trusted-hardware compromise'},
-  explain:"Almost energy-free like PoS, but its fairness depends on trusting specialised hardware manufacturers — a centralisation trade-off of a different kind.",
-  performance: { tps: "Moderate", blockTime: "Variable", finality: "Fast", energy: "Very Low", latency: "Medium" },
-  pros: ["Fair lottery system", "Energy efficient", "Fast block times"],
-  cons: ["Relies on specialized trusted hardware (like Intel SGX)", "Hardware centralization risk", "Not purely permissionless"],
-  chains:[
-    {name:'Hyperledger Sawtooth', why:'Built by Intel; PoET suits permissioned enterprise networks that can rely on standardised trusted hardware.', lang:'Python, Go, JavaScript, Rust'}
+  vizCaption:'Each validator gets a hardware-issued random countdown — first to reach zero honestly wins.',
+  trilemma:{scal:8, sec:8, dec:4, blockTime:'Variable (seconds)', tps:'Moderate', attack:'Trusted-hardware compromise'},
+  
+  trilemmaTable: [
+    {prop: '🚀 Scalability', rating: '★★★★☆ (4/5)', exp: 'No mining competition reduces computation, allowing efficient block creation.'},
+    {prop: '🔒 Security', rating: '★★★★☆ (4/5)', exp: 'Security relies on trusted hardware (Intel SGX) to generate fair and tamper-proof waiting times.'},
+    {prop: '🌐 Decentralization', rating: '★★☆☆☆ (2/5)', exp: 'Requires specialized trusted hardware and is mainly used in permissioned networks.'}
   ],
-  summary: { mining: "No", validators: "Nodes with TEE", voting: "No", speed: "High", security: "Moderate", decentralization: "Moderate" }
+  trilemmaSummary: 'PoET provides <b>fast, energy-efficient consensus</b> without mining, but its reliance on trusted hardware and permissioned environments limits decentralization.',
+
+  performance: { tps: "Moderate", blockTime: "Variable", finality: "Fast", energy: "Very Low", latency: "Medium" },
+  pros: ["Very low energy consumption", "No expensive mining hardware required", "Fair validator selection using random waiting times", "Fast transaction confirmation", "Well suited for enterprise and permissioned blockchain networks"],
+  cons: ["Depends on trusted hardware (Intel SGX)", "Primarily designed for permissioned blockchains", "Lower decentralization due to hardware requirements", "Limited adoption compared to PoW and PoS", "Trust in hardware manufacturers is required"],
+  chains:[
+    {name:'Hyperledger Sawtooth', why:'Uses PoET to achieve efficient and fair consensus in enterprise blockchain networks.', lang:'Python, JavaScript, Go, Java, Rust'}
+  ],
+  
+  smartContracts: [
+    {chain: 'Hyperledger Sawtooth', lang: 'Python, JavaScript, Go, Java, Rust', rel: 'PoET determines who creates the next block, while transaction processors (smart contracts) implement business logic.'}
+  ],
+  smartContractNote: "<b>Note:</b> PoET decides <b>who creates the next block</b>, while smart contract languages define <b>how blockchain applications are developed</b>.",
+
+  layerClassification: {
+    layer: 'Layer 1',
+    description: 'Hyperledger Sawtooth is a Layer 1 blockchain. A Layer 1 blockchain is responsible for validating transactions, maintaining the blockchain ledger, reaching consensus, and executing smart contracts.',
+    examples: ['Hyperledger Sawtooth'],
+    whyNotLayer2: 'PoET enables Layer 1 consensus by selecting validators through random waiting times instead of mining or staking.'
+  },
+  
+  compatibility: [
+    {name:'Hyperledger Sawtooth', consensus:'PoET', compatible:true},
+    {name:'Hyperledger Fabric', consensus:'PBFT', compatible:false},
+    {name:'Bitcoin', consensus:'PoW', compatible:false},
+    {name:'Ethereum', consensus:'PoS', compatible:false},
+    {name:'Solana', consensus:'PoH + PoS', compatible:false},
+    {name:'Cardano', consensus:'PoS', compatible:false},
+    {name:'Chia Network', consensus:'PoSp + Proof of Time', compatible:false}
+  ],
+
+  summary: { mining: "No", validators: "Nodes with TEE", voting: "No", speed: "High", security: "Moderate", decentralization: "Low" },
+  
+  mappingAdditionalInfo: [
+    { title: "TEE (Trusted Execution Environment)", text: "A <b>Trusted Execution Environment (TEE)</b> is a <b>secure area inside a processor (CPU)</b> that runs sensitive code and stores confidential data in isolation from the rest of the system. Even if the operating system is compromised, the code running inside the TEE remains protected.<br><br><b>Example:</b> In <b>Proof of Elapsed Time (PoET)</b>, the TEE securely generates a random waiting time for each validator, ensuring that no validator can cheat." },
+    { title: "SGX (Software Guard Extensions)", text: "<b>Software Guard Extensions (SGX)</b> is a security technology developed by <b>Intel</b> that provides a <b>Trusted Execution Environment (TEE)</b>. It creates secure memory regions called <b>enclaves</b>, where sensitive code and data can run safely without interference.<br><br><b>Example:</b> In <b>PoET</b>, Intel SGX generates and verifies the random waiting time inside a secure enclave, ensuring that the waiting time cannot be modified or forged.<br><br><b>In simple terms:</b> <b>TEE</b> is the <b>secure execution environment</b>, while <b>Intel SGX</b> is a <b>technology that implements a TEE</b> on Intel processors." }
+  ],
+  takeaway: "<b>Proof of Elapsed Time (PoET)</b> is a consensus algorithm that selects the next block creator by assigning each validator a <b>random waiting time</b>. The validator whose timer expires first creates the next block. By relying on <b>trusted hardware</b> instead of mining or staking, PoET provides <b>low energy consumption, fast consensus, and fair validator selection</b>, making it well suited for <b>enterprise and private blockchain networks</b>."
 },
 {
   id:'poi', code:'PoI', name:'Proof of Importance',

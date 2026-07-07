@@ -1502,41 +1502,240 @@ function initPobDemo(container, desc) {
 // 9. PoET Demo
 // ==========================================
 function initPoetDemo(container, desc) {
-  desc.textContent = "Proof of Elapsed Time: A hardware enclave assigns a random wait time. First to wake up wins.";
+  desc.innerHTML = "Proof of Elapsed Time: Enter a wait time for each node. The <b>Intel SGX TEE</b> enforces the countdown. The node whose timer expires first wins the right to produce the block.";
+  
+  let state = {
+    timerMe: 0,
+    timerA: 0,
+    timerB: 0,
+    phase: 0 // 0: idle, 1: counting
+  };
+
   container.innerHTML = `
-    <div class="demo-block" style="text-align:center;">
-      <button class="demo-btn" id="poetBtn">🎲 Request Wait Times</button>
-      <div style="display:flex; justify-content:space-around; margin-top:30px;" id="poetNodes">
-        <div style="border:1px solid var(--line); padding:10px; border-radius:6px; width:100px;">Node 1<br><b id="pt1" style="font-size:1.5rem; color:var(--cyan)">--</b></div>
-        <div style="border:1px solid var(--line); padding:10px; border-radius:6px; width:100px;">Node 2<br><b id="pt2" style="font-size:1.5rem; color:var(--cyan)">--</b></div>
-        <div style="border:1px solid var(--line); padding:10px; border-radius:6px; width:100px;">Node 3<br><b id="pt3" style="font-size:1.5rem; color:var(--cyan)">--</b></div>
+    <div style="display:flex; justify-content:flex-end; margin-bottom: 15px;">
+      <button class="demo-btn" id="poetResetBtn" style="padding: 6px 12px; font-size: 0.85rem;">↺ Reset Demo</button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      
+      <!-- Intel SGX Hardware Panel -->
+      <div class="demo-block" style="background:rgba(0,0,0,0.02); border-color:var(--cyan);" id="poetNetworkPanel">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom:10px;">
+          <h4 style="margin-top:0; color:var(--cyan); font-family:'Orbitron';">Intel SGX TEE (Secure Hardware Enclave)</h4>
+        </div>
+        <div style="display:flex; justify-content:space-between; text-align:center;">
+          <div style="flex:1;">
+            <div style="color:var(--ink-faint); font-size:0.8rem;">Your Timer</div>
+            <div style="margin-top:5px; display:flex; align-items:center; justify-content:center; gap:5px;">
+              <input type="number" id="poetInputMe" class="demo-input" style="width:70px; text-align:center; font-family:'Share Tech Mono'; color:var(--magenta);" value="5.0" step="0.1" min="0.1"> 
+              <span style="color:var(--magenta);">s</span>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div style="color:var(--ink-faint); font-size:0.8rem;">Rival A Timer</div>
+            <div style="margin-top:5px; display:flex; align-items:center; justify-content:center; gap:5px;">
+              <input type="number" id="poetInputA" class="demo-input" style="width:70px; text-align:center; font-family:'Share Tech Mono';" value="7.5" step="0.1" min="0.1"> 
+              <span>s</span>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <div style="color:var(--ink-faint); font-size:0.8rem;">Rival B Timer</div>
+            <div style="margin-top:5px; display:flex; align-items:center; justify-content:center; gap:5px;">
+              <input type="number" id="poetInputB" class="demo-input" style="width:70px; text-align:center; font-family:'Share Tech Mono';" value="3.2" step="0.1" min="0.1"> 
+              <span>s</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="poetRes" class="demo-message"></div>
+
+      <!-- Block 1 -->
+      <div class="demo-block" id="poetBlock1">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom: 16px;">
+          <h4 style="margin:0; color:var(--cyan); font-family:'Orbitron';">Block #1</h4>
+        </div>
+        <div class="demo-row" style="align-items:flex-start;"><span class="demo-label">Data</span><textarea class="demo-textarea" id="poetData1">TX: System -> Alice 10 Tokens</textarea></div>
+        <div class="demo-row"><span class="demo-label">Producer</span><input type="text" class="demo-input" id="poetProd1" disabled placeholder="Waiting for timer..."></div>
+        <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="poetPrev1" value="00000000000000000000000000000000" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
+        <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="poetHash1" disabled style="font-size:0.75rem;"></div>
+        <button class="demo-btn" id="poetBtn1" style="margin-top:15px; border-color:var(--cyan); color:var(--cyan);">⏱️ Start SGX Timers</button>
+      </div>
+
+      <!-- Block 2 -->
+      <div class="demo-block invalid" id="poetBlock2" style="opacity:0.5; pointer-events:none;">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom: 16px;">
+          <h4 style="margin:0; color:var(--cyan); font-family:'Orbitron';">Block #2</h4>
+        </div>
+        <div class="demo-row" style="align-items:flex-start;"><span class="demo-label">Data</span><textarea class="demo-textarea" id="poetData2">TX: Alice -> Bob 5 Tokens</textarea></div>
+        <div class="demo-row"><span class="demo-label">Producer</span><input type="text" class="demo-input" id="poetProd2" disabled placeholder="Waiting for timer..."></div>
+        <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="poetPrev2" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
+        <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="poetHash2" disabled style="font-size:0.75rem;"></div>
+        <button class="demo-btn" id="poetBtn2" style="margin-top:15px; border-color:var(--cyan); color:var(--cyan);" disabled>⏱️ Start SGX Timers</button>
+      </div>
+
+      <!-- Block 3 -->
+      <div class="demo-block invalid" id="poetBlock3" style="opacity:0.5; pointer-events:none;">
+        <div class="demo-row" style="justify-content:space-between; margin-bottom: 16px;">
+          <h4 style="margin:0; color:var(--cyan); font-family:'Orbitron';">Block #3</h4>
+        </div>
+        <div class="demo-row" style="align-items:flex-start;"><span class="demo-label">Data</span><textarea class="demo-textarea" id="poetData3">TX: Bob -> Charlie 2 Tokens</textarea></div>
+        <div class="demo-row"><span class="demo-label">Producer</span><input type="text" class="demo-input" id="poetProd3" disabled placeholder="Waiting for timer..."></div>
+        <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="poetPrev3" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
+        <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="poetHash3" disabled style="font-size:0.75rem;"></div>
+        <button class="demo-btn" id="poetBtn3" style="margin-top:15px; border-color:var(--cyan); color:var(--cyan);" disabled>⏱️ Start SGX Timers</button>
+      </div>
     </div>
   `;
-  let intr;
-  document.getElementById('poetBtn').addEventListener('click', () => {
-    clearInterval(intr);
-    const t = [Math.floor(Math.random()*50)+10, Math.floor(Math.random()*50)+10, Math.floor(Math.random()*50)+10];
-    const els = [document.getElementById('pt1'), document.getElementById('pt2'), document.getElementById('pt3')];
-    const res = document.getElementById('poetRes');
-    res.style.display = 'none';
-    
-    intr = setInterval(() => {
-      let winner = -1;
-      for(let i=0; i<3; i++) {
-        t[i]--;
-        els[i].textContent = Math.max(0, t[i]);
-        if(t[i] === 0 && winner === -1) winner = i;
+
+  const blocks = [
+    {
+      blockEl: document.getElementById('poetBlock1'),
+      dataEl: document.getElementById('poetData1'),
+      prodEl: document.getElementById('poetProd1'),
+      prevEl: document.getElementById('poetPrev1'),
+      hashEl: document.getElementById('poetHash1'),
+      btn: document.getElementById('poetBtn1'),
+      signed: false
+    },
+    {
+      blockEl: document.getElementById('poetBlock2'),
+      dataEl: document.getElementById('poetData2'),
+      prodEl: document.getElementById('poetProd2'),
+      prevEl: document.getElementById('poetPrev2'),
+      hashEl: document.getElementById('poetHash2'),
+      btn: document.getElementById('poetBtn2'),
+      signed: false
+    },
+    {
+      blockEl: document.getElementById('poetBlock3'),
+      dataEl: document.getElementById('poetData3'),
+      prodEl: document.getElementById('poetProd3'),
+      prevEl: document.getElementById('poetPrev3'),
+      hashEl: document.getElementById('poetHash3'),
+      btn: document.getElementById('poetBtn3'),
+      signed: false
+    }
+  ];
+
+  const tMeInput = document.getElementById('poetInputMe');
+  const tAInput = document.getElementById('poetInputA');
+  const tBInput = document.getElementById('poetInputB');
+
+  blocks.forEach((b, i) => {
+    b.btn.addEventListener('click', () => {
+      if(state.phase === 1) return;
+      
+      // Read values from inputs
+      state.timerMe = parseFloat(tMeInput.value) || 0;
+      state.timerA = parseFloat(tAInput.value) || 0;
+      state.timerB = parseFloat(tBInput.value) || 0;
+      
+      if(state.timerMe <= 0 && state.timerA <= 0 && state.timerB <= 0) {
+        alert("Please set at least one timer greater than 0.");
+        return;
       }
-      if(winner > -1) {
-        clearInterval(intr);
-        els[winner].style.color = 'var(--green)';
-        res.textContent = `Node ${winner+1}'s timer expired first! They produce the block.`;
-        res.className = 'demo-message success';
+
+      b.btn.disabled = true;
+      b.btn.textContent = "Waiting for TEE Countdown...";
+      b.btn.style.borderColor = "var(--line)";
+      b.btn.style.color = "var(--ink-faint)";
+      
+      state.phase = 1;
+      
+      // Disable inputs during countdown
+      tMeInput.disabled = true;
+      tAInput.disabled = true;
+      tBInput.disabled = true;
+      tMeInput.style.color = "var(--magenta)";
+      tAInput.style.color = "var(--ink)";
+      tBInput.style.color = "var(--ink)";
+
+      const countdownInterval = setInterval(async () => {
+        state.timerMe = Math.max(0, (state.timerMe - 0.1).toFixed(1));
+        state.timerA = Math.max(0, (state.timerA - 0.1).toFixed(1));
+        state.timerB = Math.max(0, (state.timerB - 0.1).toFixed(1));
+
+        tMeInput.value = state.timerMe;
+        tAInput.value = state.timerA;
+        tBInput.value = state.timerB;
+
+        let winnerName = "";
+        let isMe = false;
+
+        if (state.timerMe <= 0) {
+          winnerName = "You";
+          isMe = true;
+          tMeInput.style.color = "var(--green)";
+        } else if (state.timerA <= 0) {
+          winnerName = "Rival A";
+          tAInput.style.color = "var(--amber)";
+        } else if (state.timerB <= 0) {
+          winnerName = "Rival B";
+          tBInput.style.color = "var(--amber)";
+        }
+
+        if (winnerName !== "") {
+          clearInterval(countdownInterval);
+          state.phase = 0;
+          
+          b.prodEl.value = winnerName;
+          b.prodEl.style.color = isMe ? "var(--green)" : "var(--amber)";
+          b.prodEl.style.fontWeight = "bold";
+
+          b.signed = true;
+          if(i > 0) b.prevEl.value = blocks[i-1].hashEl.value;
+          await updateBlockHash(b);
+          
+          b.btn.textContent = isMe ? "✅ You Produced Block" : "⚠️ Rival Produced Block";
+          b.btn.style.borderColor = isMe ? "var(--green)" : "var(--amber)";
+          b.btn.style.color = isMe ? "var(--green)" : "var(--amber)";
+          b.blockEl.style.borderColor = isMe ? "var(--green)" : "var(--amber)";
+          b.blockEl.classList.remove('invalid');
+          
+          // Re-enable inputs for the next block
+          tMeInput.disabled = false;
+          tAInput.disabled = false;
+          tBInput.disabled = false;
+          
+          // Reset default values to something random for next round so they don't stay 0
+          tMeInput.value = (2 + Math.random() * 4).toFixed(1);
+          tAInput.value = (2 + Math.random() * 4).toFixed(1);
+          tBInput.value = (2 + Math.random() * 4).toFixed(1);
+          tMeInput.style.color = "var(--magenta)";
+          tAInput.style.color = "var(--ink)";
+          tBInput.style.color = "var(--ink)";
+
+          // Enable next block
+          if(i+1 < blocks.length) {
+            blocks[i+1].blockEl.style.opacity = '1';
+            blocks[i+1].blockEl.style.pointerEvents = 'auto';
+            blocks[i+1].prevEl.value = b.hashEl.value;
+            blocks[i+1].btn.disabled = false;
+          }
+        }
+      }, 100);
+    });
+
+    b.dataEl.addEventListener('input', async () => {
+      if(b.signed) {
+        await updateBlockHash(b);
+        for(let j=i+1; j<blocks.length; j++) {
+          if(blocks[j].signed) {
+            blocks[j].prevEl.value = blocks[j-1].hashEl.value;
+            await updateBlockHash(blocks[j]);
+          }
+        }
       }
-    }, 100);
+    });
   });
+
+  document.getElementById('poetResetBtn').addEventListener('click', () => initPoetDemo(container, desc));
+  
+  async function updateBlockHash(b) {
+    const content = b.dataEl.value + b.prodEl.value + b.prevEl.value;
+    b.hashEl.value = await sha256(content);
+  }
+
+  // Initialize initial hash
+  updateBlockHash(blocks[0]);
 }
 
 // ==========================================
