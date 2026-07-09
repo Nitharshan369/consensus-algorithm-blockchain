@@ -197,7 +197,7 @@ function initPowDemo(container, desc) {
 // 2. PoS Demo
 // ==========================================
 function initPosDemo(container, desc) {
-  desc.textContent = "Proof of Stake: Adjust the stake amounts. The probability of being chosen to propose a block is proportional to the stake. Click 'Propose Block' to run the lottery, select a validator, and generate the next block!";
+  desc.textContent = "Proof of Stake: Adjust the stake amounts. For this simplified demo, the validator with the highest stake (highest percentage) is always selected to propose the block. Click 'Propose Block' to select a validator and generate the next block!";
   
   container.innerHTML = `
     <div style="display:flex; justify-content:flex-end; margin-bottom: 15px;">
@@ -209,19 +209,19 @@ function initPosDemo(container, desc) {
       <div class="demo-block" style="background:rgba(0,0,0,0.02); border-color:var(--cyan);">
         <h4 style="margin-top:0; color:var(--cyan); font-family:'Orbitron';">Validator Staking Pool</h4>
         <div class="demo-row">
-          <span class="demo-label" style="color:var(--green)">Node A</span>
+          <span class="demo-label" style="color:var(--green); min-width: 120px;">Node A <span id="posA_chance" style="font-size:0.75em; color:var(--ink-dim); font-weight:normal">(62.5%)</span></span>
           <input type="range" id="posA" min="1" max="100" value="50" style="flex-grow:1">
-          <span id="posA_val" class="demo-label" style="text-align:right">50 ETH</span>
+          <span id="posA_val" class="demo-label" style="text-align:right; min-width: 60px;">50 ETH</span>
         </div>
         <div class="demo-row">
-          <span class="demo-label" style="color:var(--magenta)">Node B</span>
+          <span class="demo-label" style="color:var(--magenta); min-width: 120px;">Node B <span id="posB_chance" style="font-size:0.75em; color:var(--ink-dim); font-weight:normal">(25.0%)</span></span>
           <input type="range" id="posB" min="1" max="100" value="20" style="flex-grow:1">
-          <span id="posB_val" class="demo-label" style="text-align:right">20 ETH</span>
+          <span id="posB_val" class="demo-label" style="text-align:right; min-width: 60px;">20 ETH</span>
         </div>
         <div class="demo-row">
-          <span class="demo-label" style="color:var(--amber)">Node C</span>
+          <span class="demo-label" style="color:var(--amber); min-width: 120px;">Node C <span id="posC_chance" style="font-size:0.75em; color:var(--ink-dim); font-weight:normal">(12.5%)</span></span>
           <input type="range" id="posC" min="1" max="100" value="10" style="flex-grow:1">
-          <span id="posC_val" class="demo-label" style="text-align:right">10 ETH</span>
+          <span id="posC_val" class="demo-label" style="text-align:right; min-width: 60px;">10 ETH</span>
         </div>
       </div>
 
@@ -231,10 +231,10 @@ function initPosDemo(container, desc) {
           <h4 style="margin:0; color:var(--cyan); font-family:'Orbitron';">Block #1 (Genesis)</h4>
         </div>
         <div class="demo-row" style="align-items:flex-start;"><span class="demo-label">Data</span><textarea class="demo-textarea" id="posData1">Staking contract deployed</textarea></div>
-        <div class="demo-row"><span class="demo-label">Proposer</span><input type="text" class="demo-input" id="posValidator1" disabled placeholder="Waiting for lottery..."></div>
+        <div class="demo-row"><span class="demo-label">Proposer</span><input type="text" class="demo-input" id="posValidator1" disabled placeholder="Waiting for selection..."></div>
         <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="posPrev1" value="00000000000000000000000000000000" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
         <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="posHash1" disabled style="font-size:0.75rem;"></div>
-        <button class="demo-btn" id="posBtn1">🎲 Run Lottery & Propose Block 1</button>
+        <button class="demo-btn" id="posBtn1">🎲 Propose Block 1</button>
       </div>
 
       <!-- Block 2 -->
@@ -243,10 +243,10 @@ function initPosDemo(container, desc) {
           <h4 style="margin:0; color:var(--cyan); font-family:'Orbitron';">Block #2</h4>
         </div>
         <div class="demo-row" style="align-items:flex-start;"><span class="demo-label">Data</span><textarea class="demo-textarea" id="posData2">Alice stakes 32 ETH</textarea></div>
-        <div class="demo-row"><span class="demo-label">Proposer</span><input type="text" class="demo-input" id="posValidator2" disabled placeholder="Waiting for lottery..."></div>
+        <div class="demo-row"><span class="demo-label">Proposer</span><input type="text" class="demo-input" id="posValidator2" disabled placeholder="Waiting for selection..."></div>
         <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="posPrev2" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
         <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="posHash2" disabled style="font-size:0.75rem;"></div>
-        <button class="demo-btn" id="posBtn2">🎲 Run Lottery & Propose Block 2</button>
+        <button class="demo-btn" id="posBtn2">🎲 Propose Block 2</button>
       </div>
 
       <!-- Block 3 -->
@@ -255,10 +255,10 @@ function initPosDemo(container, desc) {
           <h4 style="margin:0; color:var(--cyan); font-family:'Orbitron';">Block #3</h4>
         </div>
         <div class="demo-row" style="align-items:flex-start;"><span class="demo-label">Data</span><textarea class="demo-textarea" id="posData3">Bob sends 5 ETH to Charlie</textarea></div>
-        <div class="demo-row"><span class="demo-label">Proposer</span><input type="text" class="demo-input" id="posValidator3" disabled placeholder="Waiting for lottery..."></div>
+        <div class="demo-row"><span class="demo-label">Proposer</span><input type="text" class="demo-input" id="posValidator3" disabled placeholder="Waiting for selection..."></div>
         <div class="demo-row"><span class="demo-label">Prev Hash</span><input type="text" class="demo-input" id="posPrev3" disabled style="font-size:0.75rem; color:var(--ink-faint);"></div>
         <div class="demo-row"><span class="demo-label">Hash</span><input type="text" class="demo-input" id="posHash3" disabled style="font-size:0.75rem;"></div>
-        <button class="demo-btn" id="posBtn3">🎲 Run Lottery & Propose Block 3</button>
+        <button class="demo-btn" id="posBtn3">🎲 Propose Block 3</button>
       </div>
 
     </div>
@@ -272,6 +272,12 @@ function initPosDemo(container, desc) {
     vA.textContent = sA.value + ' ETH';
     vB.textContent = sB.value + ' ETH';
     vC.textContent = sC.value + ' ETH';
+
+    const a = parseInt(sA.value), b = parseInt(sB.value), c = parseInt(sC.value);
+    const total = a + b + c;
+    document.getElementById('posA_chance').textContent = `(${((a/total)*100).toFixed(1)}%)`;
+    document.getElementById('posB_chance').textContent = `(${((b/total)*100).toFixed(1)}%)`;
+    document.getElementById('posC_chance').textContent = `(${((c/total)*100).toFixed(1)}%)`;
   };
   sA.addEventListener('input', updateStakes); sB.addEventListener('input', updateStakes); sC.addEventListener('input', updateStakes);
 
@@ -316,18 +322,16 @@ function initPosDemo(container, desc) {
 
   blocks.forEach((b, i) => {
     b.btn.addEventListener('click', async () => {
-      // Run Lottery
+      // Select Highest Stake
       const a = parseInt(sA.value), b_stake = parseInt(sB.value), c = parseInt(sC.value);
-      const total = a + b_stake + c;
-      const r = Math.random() * total;
       
       let winnerName, winnerColor;
-      if(r < a) { winnerName = 'Node A'; winnerColor = 'var(--green)'; }
-      else if (r < a + b_stake) { winnerName = 'Node B'; winnerColor = 'var(--magenta)'; }
+      if(a >= b_stake && a >= c) { winnerName = 'Node A'; winnerColor = 'var(--green)'; }
+      else if (b_stake >= a && b_stake >= c) { winnerName = 'Node B'; winnerColor = 'var(--magenta)'; }
       else { winnerName = 'Node C'; winnerColor = 'var(--amber)'; }
 
       // Assign Validator
-      b.valEl.value = `${winnerName} (Selected via Lottery)`;
+      b.valEl.value = `${winnerName} (Highest Stake Selected)`;
       b.valEl.style.color = winnerColor;
       b.valEl.style.fontWeight = 'bold';
       b.signed = true;
