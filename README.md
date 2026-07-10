@@ -176,8 +176,5 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## Author
 
-**Nitharshan Krishnamurthi**
-**Prasanna B**
-
-GitHub: https://github.com/Nitharshan369
-GitHub: https://github.com/Prasanna-Balakrishnan
+- **[Nitharshan CK](https://github.com/Nitharshan369)**
+- **[Prasanna B](https://github.com/Prasanna-Balakrishnan)**
