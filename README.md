@@ -45,11 +45,10 @@ This project provides an educational implementation of blockchain fundamentals a
 
 ## Technologies Used
 
-- Python
+- JavaScript
 - SHA-256 Cryptographic Hashing
-- REST APIs (if applicable)
-- JSON
-- Flask (if applicable)
+- HTML
+- CSS
 
 ---
 
